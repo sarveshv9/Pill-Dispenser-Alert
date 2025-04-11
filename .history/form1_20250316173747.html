@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💊 Pill Reminder</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #E3F2FD, #64B5F6); /* Light blue gradient */
+            color: #0D47A1; /* Dark blue text */
+            text-align: center;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        /* Glassmorphism Container */
+        .container {
+            background: #ffffffe6;
+            backdrop-filter: blur(15px);
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid #2196f399; /* Blue border */
+            box-shadow: 0 6px 12px rgba(33, 150, 243, 0.2);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        /* Form Styles */
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+        }
+
+        label {
+            font-weight: bold;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #16423C;
+        }
+
+        input {
+            padding: 10px;
+            border-radius: 8px;
+            border: 2px solid #1976D2; /* Blue border */
+            outline: none;
+            font-size: 14px;
+            background: white;
+            color: #0D47A1;
+        }
+
+
+        button {
+            background: #1976D2; /* Solid blue */
+            color: white;
+            padding: 12px;
+            border: 2px solid #0D47A1;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-weight: 600;
+            text-transform: uppercase;
+            box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+        }
+
+        button:hover {
+            background: #1565C0; /* Slightly darker blue */
+            transform: scale(1.05);
+            box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4);
+        }
+
+        .snooze-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .snooze-container input {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        #error-message {
+            color: red;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        /* Alarm Notification */
+        #alarm-box {
+            display: none;
+            margin-top: 20px;
+            background: #1565C0; /* Blue */
+            padding: 15px;
+            border-radius: 12px;
+            color: white;
+            text-align: center;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        #alarm-box img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+            input, button {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>💊 Pill Reminder</h1>
+
+    <div class="container">
+        <form id="pillForm">
+            <label for="name">👤 Name:</label>
+            <input type="text" id="name" required placeholder="Enter your name">
+
+            <label for="pillName">💊 Pill Name:</label>
+            <input type="text" id="pillName" required placeholder="Enter pill name">
+
+            <label for="startDate">📅 Start Date:</label>
+            <input type="date" id="startDate" required>
+
+            <label for="endDate">📅 End Date:</label>
+            <input type="date" id="endDate" required>
+
+            <label for="alarmTime">⏰ Alarm Time:</label>
+            <input type="time" id="alarmTime" required>
+
+            <label for="pillPhoto">📸 Upload Photo:</label>
+            <input type="file" id="pillPhoto" accept="image/*">
+
+            <div class="snooze-container">
+                <input type="checkbox" id="snooze">
+                <label for="snooze">🔔 Enable Snooze</label>
+            </div>
+
+            <button type="submit">✅ Set Reminder</button>
+        </form>
+
+        <p id="error-message"></p>
+
+        <!-- Display Upcoming Alarm -->
+        <p id="upcoming-alarm">⏳ No upcoming alarms.</p>
+
+        <!-- Alarm Notification Box -->
+        <div id="alarm-box">
+            <h2>⏳ Time to take your pill!</h2>
+            <img id="pill-image" src="" alt="Pill Image">
+            <button id="stopAlarm">✔ Done</button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("pillForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            const name = document.getElementById("name").value;
+            const pillName = document.getElementById("pillName").value;
+            const alarmTime = document.getElementById("alarmTime").value;
+            const upcomingAlarm = document.getElementById("upcoming-alarm");
+
+            if (name && pillName && alarmTime) {
+                upcomingAlarm.innerHTML = `⏳ Next Pill Reminder: <b>${pillName}</b> at <b>${alarmTime}</b>`;
+            } else {
+                document.getElementById("error-message").textContent = "⚠ Please fill all required fields!";
+            }
+        });
+
+        document.getElementById("stopAlarm").addEventListener("click", function() {
+            document.getElementById("alarm-box").style.display = "none";
+        });
+        function goToUpcomingAlarms() {
+            window.location.href = "upcoming-alarms.html";
+        }
+    </script>
+    
+    <!-- Add Button to Go to Upcoming Alarms Page -->
+    <button onclick="goToUpcomingAlarms()">📅 View Upcoming Alarms</button>
+   
+
+</body>
+</html>

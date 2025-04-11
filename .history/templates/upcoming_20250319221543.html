@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upcoming Alarms</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            background: linear-gradient(135deg, #E3F2FD, #64B5F6);
+            color: #0D47A1;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            max-width: 500px;
+            margin: auto;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .alarm-item {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        #alarm-popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            z-index: 1000;
+        }
+
+        #alarm-popup img {
+            width: 100px;
+            border-radius: 10px;
+        }
+
+        .popup-btn {
+            margin-top: 10px;
+            padding: 10px 15px;
+            border: none;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .done-btn {
+            background: green;
+            color: white;
+        }
+
+        .snooze-btn {
+            background: orange;
+            color: white;
+        }
+
+        .popup-btn:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>📅 Upcoming Alarms</h1>
+
+    <div class="container">
+        {% for alarm in alarms %}
+            <div class="alarm-item">
+                <b>{{ alarm.medicine }}</b><br>
+                ⏰ Time: <b>{{ alarm.time }}</b><br>
+                📅 Start Date: <b>{{ alarm.start_date or 'Not Set' }}</b><br>
+                📅 End Date: <b>{{ alarm.end_date or 'Not Set' }}</b><br>
+                {% if alarm.image %}
+                    <img src="{{ url_for('static', filename='uploads/' + alarm.image) }}" alt="Pill Image" width="150">
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Alarm Popup -->
+    <div id="alarm-popup">
+        <h2>🔔 Reminder!</h2>
+        <p id="alarm-message"></p>
+        <img id="alarm-image" src="" alt="Pill Image" style="display: none;">
+        <br>
+        <button class="popup-btn done-btn" onclick="markAsDone()">Done</button>
+        <button class="popup-btn snooze-btn" onclick="snoozeAlarm()">Snooze</button>
+    </div>
+
+    <script>
+        function checkAlarms() {
+            fetch('/get_alarms')
+            .then(response => response.json())
+            .then(data => {
+                let now = new Date();
+                let currentTime = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
+
+                data.forEach(alarm => {
+                    if (alarm.time === currentTime) {
+                        showAlarmPopup(alarm);
+                        playSound();
+                    }
+                });
+            });
+        }
+
+        function showAlarmPopup(alarm) {
+            document.getElementById("alarm-message").innerText = "Time to take: " + alarm.medicine;
+            
+            let imageElement = document.getElementById("alarm-image");
+            if (alarm.image) {
+                imageElement.src = alarm.image;
+                imageElement.style.display = "block";
+            } else {
+                imageElement.style.display = "none";
+            }
+
+            document.getElementById("alarm-popup").style.display = "block";
+        }
+
+        function playSound() {
+            let audio = new Audio('/static/alert.mp3'); 
+            audio.play();
+        }
+
+        function markAsDone() {
+            fetch('/mark_alarm_done', { method: 'POST' })
+            .then(() => {
+                document.getElementById("alarm-popup").style.display = "none";
+            });
+        }
+
+        function snoozeAlarm() {
+            setTimeout(() => {
+                playSound();
+                document.getElementById("alarm-popup").style.display = "block";
+            }, 300000); // Snooze for 5 minutes
+            document.getElementById("alarm-popup").style.display = "none";
+        }
+
+        setInterval(checkAlarms, 60000); // Check every minute
+    </script>
+    <button onclick="location.href='/dashboard'">⬅ Back</button>
+</body>
+</html>

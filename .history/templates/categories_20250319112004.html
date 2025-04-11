@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Choose Your Category</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #7fd0ff, #2764b4);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px;
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 30px;
+      font-size: 2.5rem;
+      text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .category-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      max-width: 900px;
+    }
+
+    .category-box {
+      background-color: #2764b4;
+      padding: 20px;
+      width: 180px;
+      border-radius: 15px;
+      border: 2px solid #16423C;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .category-box:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    }
+
+    .category-icon {
+      font-size: 50px;
+      margin-bottom: 15px;
+    }
+
+    .category-name {
+      font-size: 18px;
+      font-weight: 600;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>🚀 Choose Your Category</h1>
+
+  <div class="category-container">
+    <div class="category-box" onclick="selectCategory('Pills Reminder')">
+      <div class="category-icon">💊</div>
+      <div class="category-name">Pills Reminder</div>
+    </div>
+
+    <div class="category-box" onclick="selectCategory('Yoga Session')">
+      <div class="category-icon">🧘‍♂️</div>
+      <div class="category-name">Yoga Session</div>
+    </div>
+
+    <div class="category-box" onclick="selectCategory('Morning Alarm')">
+      <div class="category-icon">⏰</div>
+      <div class="category-name">Morning Alarm</div>
+    </div>
+
+    <div class="category-box" onclick="selectCategory('Sleeping Alarm')">
+      <div class="category-icon">🌙</div>
+      <div class="category-name">Sleeping Alarm</div>
+    </div>
+
+    <div class="category-box" onclick="selectCategory('Water Reminder')">
+      <div class="category-icon">💧</div>
+      <div class="category-name">Water Reminder</div>
+    </div>
+
+    <div class="category-box" onclick="selectCategory('Workout Time')">
+      <div class="category-icon">🏋️‍♀️</div>
+      <div class="category-name">Workout Time</div>
+    </div>
+  </div>
+
+  <script>
+    function selectCategory(category) {
+      alert(`You selected: ${category}`);
+      // Add redirection or further actions here
+    }
+  </script>
+
+</body>
+
+</html>

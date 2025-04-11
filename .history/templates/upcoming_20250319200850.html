@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upcoming Alarms</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            background: linear-gradient(135deg, #E3F2FD, #64B5F6);
+            color: #0D47A1;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            max-width: 500px;
+            margin: auto;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .alarm-item {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        button {
+            background: #1976D2;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: none;
+            margin-top: 15px;
+        }
+
+        button:hover {
+            background: #1565C0;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>📅 Upcoming Alarms</h1>
+
+    
+
+    <script>
+        function loadAlarms() {
+            let alarms = JSON.parse(localStorage.getItem("alarms")) || [];
+            let alarmList = document.getElementById("alarm-list");
+            alarmList.innerHTML = "";
+    
+            if (alarms.length === 0) {
+                alarmList.innerHTML = "No upcoming alarms.";
+                return;
+            }
+    
+            alarms.forEach(alarm => {
+                let div = document.createElement("div");
+                div.className = "alarm-item";
+                div.innerHTML = `<b>${alarm.pillName}</b> at ${alarm.alarmTime} <br> 📅 ${alarm.startDate} to ${alarm.endDate}`;
+                alarmList.appendChild(div);
+            });
+        }
+    
+       
+        window.onload = loadAlarms;
+
+        function checkAlarms() {
+            fetch('/get_alarms')
+            .then(response => response.json())
+            .then(data => {
+                let now = new Date();
+                let currentTime = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
+    
+                data.forEach(alarm => {
+                    if (alarm.time === currentTime) {
+                        alert("Reminder: " + alarm.medicine);
+                        playSound();
+                    }
+                });
+            });
+        }
+    
+        function playSound() {
+            let audio = new Audio('/static/alert.mp3'); 
+            audio.play();
+        }
+    
+        setInterval(checkAlarms, 60000);
+    </script>
+    <div class="container">
+        {% for alarm in alarms %}
+            <div class="alarm-item">
+                <b>{{ alarm.medicine }}</b><br>
+                ⏰ Time: <b>{{ alarm.time }}</b><br>
+                📅 Start Date: <b>{{ alarm.start_date }}</b><br>
+                📅 End Date: <b>{{ alarm.end_date }}</b><br>
+                {% if alarm.image %}
+                    <img src="{{ url_for('static', filename='uploads/' + alarm.image) }}" alt="Pill Image">
+                {% endif %}
+            </div>
+        {% endfor %}
+        <button onclick="location.href='/dashboard'">⬅ Back</button>
+    </div>
+
+
+</body>
+</html>

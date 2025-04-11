@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pill Information Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .form-container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 500px;
+            padding: 30px;
+            font-size: 16px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .form-container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #333;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        /* Color changes for each block */
+        .input-group:nth-child(1) {
+            background-color: #f0f8ff; /* Light blue for Name */
+        }
+        .input-group:nth-child(2) {
+            background-color: #f0f8ff; /* Light beige for Pill Name */
+        }
+        .input-group:nth-child(3) {
+            background-color: #f0f8ff; /* Light cyan for Start Date */
+        }
+        .input-group:nth-child(4) {
+            background-color: #f0f8ff; /* Light pink for End Date */
+        }
+        .input-group:nth-child(5) {
+            background-color: #f0f8ff; /* Light yellow for Upload Pill Photo */
+        }
+        .input-group:nth-child(6) {
+            background-color: #f0f8ff; /* Light green for Alarm Time */
+        }
+        .input-group:nth-child(7) {
+            background-color: #fff3e6; /* Light peach for Snooze */
+        }
+
+        .input-group label {
+            font-size: 14px;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: bold;
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        .input-group input[type="file"] {
+            padding: 0;
+        }
+
+        .input-group input[type="time"] {
+            width: 100%;
+        }
+
+        .input-group input[type="checkbox"] {
+            width: auto;
+        }
+
+        .submit-btn,
+        .edit-btn {
+            padding: 12px;
+            width: 100%;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 6px;
+            border: none;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .submit-btn {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .submit-btn:hover {
+            background-color: #45a049;
+        }
+
+        .edit-btn {
+            background-color: #FFA500;
+            color: white;
+            width: auto;
+            margin-top: 10px;
+            align-self: flex-end; /* Align to the right */
+        }
+
+        .edit-btn:hover {
+            background-color: #e68900;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .checkbox-label {
+            font-size: 14px;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="form-container">
+        <h2>Pill Information Form</h2>
+
+        <form action="/submit" method="POST" enctype="multipart/form-data">
+            <!-- Name of the person -->
+            <div class="input-group">
+                <label for="name">Name of the Person</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+
+            <!-- Name of the Pill -->
+            <div class="input-group">
+                <label for="pill-name">Name of the Pill</label>
+                <input type="text" id="pill-name" name="pill_name" required>
+            </div>
+
+            <!-- Start Date -->
+            <div class="input-group">
+                <label for="start-date">Start Date</label>
+                <input type="date" id="start-date" name="start_date" required>
+            </div>
+
+            <!-- End Date -->
+            <div class="input-group">
+                <label for="end-date">End Date</label>
+                <input type="date" id="end-date" name="end_date" required>
+            </div>
+
+            <!-- Upload the Photo of the Pill -->
+            <div class="input-group">
+                <label for="pill-photo">Upload the Photo of the Pill</label>
+                <input type="file" id="pill-photo" name="pill_photo" accept="image/*" required>
+            </div>
+
+            <!-- Alarm Time and Snooze Option -->
+            <div class="input-group">
+                <label for="alarm-time">Set Alarm Time</label>
+                <input type="time" id="alarm-time" name="alarm_time" required>
+            </div>
+
+            <div class="input-group">
+                <input type="checkbox" id="snooze" name="snooze" value="yes">
+                <label for="snooze" class="checkbox-label">Enable Snooze</label>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="submit-btn">Submit</button>
+
+            <!-- Edit Button -->
+            <button type="button" class="edit-btn" onclick="editForm()">Edit</button>
+        </form>
+
+        <div class="error-message" id="error-message"></div>
+
+    </div>
+    
+    <p id="error-message"></p>
+    
+    <!-- Display Upcoming Alarm -->
+    <p id="upcoming-alarm">No upcoming alarms.</p>
+    
+    <!-- Alarm Notification Box with Pill Image -->
+    <div id="alarm-box" style="display:none; background: #ffcc00; padding: 20px; text-align: center;">
+        <h2>Time to take your pill!</h2>
+        <img id="pill-image" src="" alt="Pill Image" style="display:none; max-width: 100px; max-height: 100px;">
+        <button id="stopAlarm">Done</button>
+    </div>
+    
+    <script src="pill.js"></script> 
+</body>
+</html>

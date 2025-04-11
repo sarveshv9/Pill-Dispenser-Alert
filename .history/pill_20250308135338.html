@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pill dispenser information</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        form {
+            background: #ffffff;
+            max-width: 400px;
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        label {
+            display: block;
+            font-weight: bold;
+            margin-top: 10px;
+            text-align: left;
+        }
+        
+        input[type="text"],
+        input[type="date"],
+        input[type="time"],
+        input[type="file"] {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        
+        input[type="checkbox"] {
+            margin-top: 10px;
+        }
+        
+        button {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 16px;
+            margin-top: 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            width: 100%;
+        }
+        
+        button:hover {
+            background: #218838;
+        }
+        
+        #error-message {
+            color: red;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        #upcoming-alarm {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-top: 20px;
+        }
+        
+        #alarm-box {
+            display: none;
+            background: #ffcc00;
+            padding: 20px;
+            text-align: center;
+            max-width: 300px;
+            margin: 20px auto;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        #alarm-box h2 {
+            font-size: 20px;
+            color: #d9534f;
+        }
+        
+        #pill-image {
+            display: none;
+            max-width: 100px;
+            max-height: 100px;
+            margin-top: 10px;
+        }
+        
+        #stopAlarm {
+            background: #dc3545;
+            margin-top: 10px;
+        }
+        
+        #stopAlarm:hover {
+            background: #c82333;
+        }
+        
+    </style>
+   
+</head>
+<body>
+   <form id="pillForm">
+    <label>Name of the Person:</label>
+    <input type="text" id="name" required>
+
+    <label>Name of the Pill:</label>
+    <input type="text" id="pillName" required>
+
+    <label>Start Date:</label>
+    <input type="date" id="startDate" required>
+
+    <label>End Date:</label>
+    <input type="date" id="endDate" required>
+
+    <label>Set Alarm Time:</label>
+    <input type="time" id="alarmTime" required>
+
+    <label>Upload the Photo of the Pill:</label>
+    <input type="file" id="pillPhoto" accept="image/*">
+
+    <label>Enable Snooze:</label>
+    <input type="checkbox" id="snooze">
+
+    <button type="submit">Submit</button>
+</form>
+
+<p id="error-message"></p>
+
+<!-- Display Upcoming Alarm -->
+<p id="upcoming-alarm">No upcoming alarms.</p>
+
+<!-- Alarm Notification Box with Pill Image -->
+<div id="alarm-box" style="display:none; background: #ffcc00; padding: 20px; text-align: center;">
+    <h2>Time to take your pill!</h2>
+    <img id="pill-image" src="" alt="Pill Image" style="display:none; max-width: 100px; max-height: 100px;">
+    <button id="stopAlarm">Done</button>
+</div>
+
+<script src="pill.js"></script> 
+</body>
+</html>
