@@ -1,128 +1,141 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📅 Upcoming Alarms</title>
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-    
-        body {
-            font-family: 'Poppins', sans-serif;
-            text-align: center;
-            background: linear-gradient(135deg, #E3F2FD, #64B5F6);
-            color: #0D47A1;
-            padding: 20px;
-            margin: 0;
-        }
-    
-        h1 {
-            font-size: 2rem;
-            margin-bottom: 20px;
-        }
-    
-        .container {
-            background: #ffffff;
-            padding: 25px;
-            border-radius: 12px;
-            max-width: 600px;
-            margin: auto;
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-            width: 100%;
-        }
-    
-        .alarm-item {
-            padding: 15px;
-            border-bottom: 1px solid #ddd;
-            margin-bottom: 15px;
-            border-radius: 8px;
-            background: #f9f9f9;
-            text-align: left;
-        }
-    
-        .alarm-item b {
-            color: #0D47A1;
-        }
-    
-        .alarm-item img {
-            width: 100%;
-            max-width: 150px;
-            border-radius: 10px;
-            margin-top: 10px;
-        }
-    
-        button {
-            background: #1976D2;
-            color: white;
-            padding: 12px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            border: none;
-            margin-top: 15px;
-            font-weight: bold;
-            font-size: 16px;
-            width: 100%;
-            max-width: 200px;
-        }
-    
-        button:hover {
-            background: #1565C0;
-        }
-    
-        @media (max-width: 480px) {
-            h1 {
-                font-size: 1.5rem;
-            }
-    
-            .container {
-                padding: 15px;
-            }
-    
-            .alarm-item {
-                font-size: 14px;
-                padding: 10px;
-            }
-    
-            .alarm-item img {
-                max-width: 100%;
-            }
-    
-            button {
-                font-size: 14px;
-                padding: 10px;
-            }
-        }
-    </style>
-    
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>📅 Upcoming Alarms</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+      background: linear-gradient(135deg, #E3F2FD, #87cefa, #64b5f6);
+      background-size: 400% 400%;
+      animation: gradientShift 15s ease infinite;
+      color: #0D47A1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 20px;
+      color: #0D47A1;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 25px;
+      border-radius: 16px;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
+    }
+
+    .alarm-item {
+      padding: 15px;
+      border-bottom: 1px solid #ddd;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      background: #f9f9f9;
+      text-align: left;
+    }
+
+    .alarm-item b {
+      color: #0D47A1;
+    }
+
+    .alarm-item img {
+      width: 100%;
+      max-width: 150px;
+      border-radius: 10px;
+      margin-top: 10px;
+    }
+
+    button {
+      background: #1976D2;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      border: none;
+      margin-top: 15px;
+      font-weight: bold;
+      font-size: 16px;
+      width: 100%;
+      max-width: 200px;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #1565C0;
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      .container {
+        padding: 15px;
+      }
+
+      .alarm-item {
+        font-size: 14px;
+        padding: 10px;
+      }
+
+      .alarm-item img {
+        max-width: 100%;
+      }
+
+      button {
+        font-size: 14px;
+        padding: 10px;
+      }
+    }
+  </style>
 </head>
 <body>
 
-    <h1>📅 Upcoming Alarms</h1>
+  <h1>📅 Upcoming Alarms</h1>
 
-    <div class="container">
-        {% if alarms %}
-            {% for alarm in alarms %}
-                <div class="alarm-item">
-                    <b>{{ alarm.medicine }}</b><br>
-                    ⏰ Time: <b>{{ alarm.time }}</b><br>
-                    📅 Start Date: {{ alarm.start_date if alarm.start_date else 'Not Set' }}<br>
-                    📅 End Date: {{ alarm.end_date if alarm.end_date else 'Not Set' }}<br>
+  <div class="container">
+    {% if alarms %}
+      {% for alarm in alarms %}
+        <div class="alarm-item">
+          <b>{{ alarm.medicine }}</b><br>
+          ⏰ Time: <b>{{ alarm.time }}</b><br>
+          📅 Start Date: {{ alarm.start_date if alarm.start_date else 'Not Set' }}<br>
+          📅 End Date: {{ alarm.end_date if alarm.end_date else 'Not Set' }}<br>
 
-                    {% if alarm.image %}
-                        <img src="{{ url_for('static', filename='uploads/' + alarm.image) }}" alt="Pill Image">
-                    {% else %}
-                        <p>No image available</p>
-                    {% endif %}
-                </div>
-            {% endfor %}
-        {% else %}
-            <p>No upcoming alarms.</p>
-        {% endif %}
+          {% if alarm.image %}
+            <img src="{{ url_for('static', filename='uploads/' + alarm.image) }}" alt="Pill Image">
+          {% else %}
+            <p>No image available</p>
+          {% endif %}
+        </div>
+      {% endfor %}
+    {% else %}
+      <p>No upcoming alarms.</p>
+    {% endif %}
 
-        <button onclick="location.href='/dashboard'">⬅ Back</button>
-    </div>
+    <button onclick="location.href='/dashboard'">⬅ Back</button>
+  </div>
 
 </body>
 </html>
