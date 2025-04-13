@@ -15,38 +15,38 @@
             justify-content: center;
             min-height: 100vh;
             margin: 0;
-            background: linear-gradient(135deg, #E3F2FD, #64B5F6); /* Light blue gradient */
-            color: #0D47A1; /* Dark blue text */
+            background: linear-gradient(135deg, #E3F2FD, #64B5F6);
+            color: #0D47A1;
             text-align: center;
             padding: 20px;
+            box-sizing: border-box;
         }
-
+    
         h1 {
             font-size: 2.2rem;
             font-weight: 700;
             margin-bottom: 20px;
         }
-
-        /* Glassmorphism Container */
+    
         .container {
             background: #ffffffe6;
             backdrop-filter: blur(15px);
             padding: 25px;
             border-radius: 15px;
-            border: 2px solid #2196f399; /* Blue border */
+            border: 2px solid #2196f399;
             box-shadow: 0 6px 12px rgba(33, 150, 243, 0.2);
             width: 100%;
             max-width: 500px;
+            box-sizing: border-box;
         }
-
-        /* Form Styles */
+    
         form {
             display: flex;
             flex-direction: column;
             gap: 12px;
             width: 100%;
         }
-
+    
         label {
             font-weight: bold;
             font-size: 15px;
@@ -55,19 +55,24 @@
             gap: 5px;
             color: #16423C;
         }
-
-        input {
+    
+        input[type="text"],
+        input[type="date"],
+        input[type="time"],
+        input[type="file"] {
             padding: 10px;
             border-radius: 8px;
-            border: 2px solid #1976D2; /* Blue border */
+            border: 2px solid #1976D2;
             outline: none;
             font-size: 14px;
             background: white;
             color: #0D47A1;
+            width: 100%;
+            box-sizing: border-box;
         }
-
+    
         button {
-            background: #1976D2; /* Solid blue */
+            background: #1976D2;
             color: white;
             padding: 12px;
             border: 2px solid #0D47A1;
@@ -78,37 +83,39 @@
             font-weight: 600;
             text-transform: uppercase;
             box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+            width: 100%;
+            box-sizing: border-box;
         }
-
+    
         button:hover {
-            background: #1565C0; /* Slightly darker blue */
+            background: #1565C0;
             transform: scale(1.05);
             box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4);
         }
-
+    
         .snooze-container {
             display: flex;
             align-items: center;
             gap: 8px;
+            flex-wrap: wrap;
         }
-
+    
         .snooze-container input {
             width: 16px;
             height: 16px;
             cursor: pointer;
         }
-
+    
         #error-message {
             color: red;
             font-size: 14px;
             margin-top: 5px;
         }
-
-        /* Alarm Notification */
+    
         #alarm-box {
             display: none;
             margin-top: 20px;
-            background: #1565C0; /* Blue */
+            background: #1565C0;
             padding: 15px;
             border-radius: 12px;
             color: white;
@@ -116,27 +123,42 @@
             width: 100%;
             max-width: 300px;
         }
-
+    
         #alarm-box img {
-            width: 80px;
-            height: 80px;
+            width: 100%;
+            max-width: 80px;
+            height: auto;
             object-fit: cover;
             border-radius: 10px;
             margin: 10px 0;
         }
-
+    
         @media (max-width: 480px) {
-            .container {
-                padding: 20px;
-            }
             h1 {
-                font-size: 1.8rem;
+                font-size: 1.6rem;
             }
-            input, button {
+    
+            label {
                 font-size: 14px;
+            }
+    
+            input,
+            button {
+                font-size: 13px;
+                padding: 10px;
+            }
+    
+            .container {
+                padding: 15px;
+            }
+    
+            #alarm-box {
+                font-size: 14px;
+                padding: 12px;
             }
         }
     </style>
+    
 </head>
 <body>
 

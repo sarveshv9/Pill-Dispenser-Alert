@@ -1,59 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>✅ Completed Alarms</title>
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            text-align: center;
-            background: linear-gradient(135deg, #E3F2FD, #64B5F6);
-            color: #0D47A1;
-            padding: 20px;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>✅ Completed Alarms</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-        .container {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            max-width: 500px;
-            margin: auto;
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-        }
+    body {
+      font-family: 'Poppins', sans-serif;
+      text-align: center;
+      background: linear-gradient(135deg, #E3F2FD, #64B5F6);
+      color: #0D47A1;
+      padding: 20px;
+      margin: 0;
+    }
 
-        .alarm-item {
-            padding: 10px;
-            border-bottom: 1px solid #ddd;
-        }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 20px;
+    }
 
-        button {
-            background: #1976D2;
-            color: white;
-            padding: 10px;
-            border-radius: 8px;
-            cursor: pointer;
-            border: none;
-            margin-top: 15px;
-        }
+    .container {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      max-width: 500px;
+      width: 100%;
+      margin: auto;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
 
-        button:hover {
-            background: #1565C0;
-        }
-    </style>
+    .alarm-item {
+      padding: 12px;
+      border-bottom: 1px solid #ddd;
+      font-size: 1rem;
+    }
+
+    .alarm-item:last-child {
+      border-bottom: none;
+    }
+
+    button {
+      background: #1976D2;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      border: none;
+      margin-top: 20px;
+      font-size: 1rem;
+    }
+
+    button:hover {
+      background: #1565C0;
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      .alarm-item {
+        font-size: 0.95rem;
+        padding: 10px;
+      }
+
+      button {
+        padding: 10px 16px;
+        font-size: 0.95rem;
+      }
+
+      .container {
+        padding: 16px;
+      }
+    }
+  </style>
 </head>
 <body>
 
-    <h1>✅ Completed Alarms</h1>
+  <h1>✅ Completed Alarms</h1>
 
-    <div class="container">
-        {% for alarm in alarms %}
-            <div class="alarm-item">
-                <b>{{ alarm.medicine }}</b> - {{ alarm.time }}
-            </div>
-        {% endfor %}
-        <button onclick="location.href='/dashboard'">⬅ Back</button>
-    </div>
+  <div class="container">
+    {% for alarm in alarms %}
+      <div class="alarm-item">
+        <b>{{ alarm.medicine }}</b> - {{ alarm.time }}
+      </div>
+    {% endfor %}
+    <button onclick="location.href='/dashboard'">⬅ Back</button>
+  </div>
 
 </body>
 </html>

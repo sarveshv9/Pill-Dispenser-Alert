@@ -7,6 +7,10 @@
   <title>💧 Water Reminder</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
+    * {
+      box-sizing: border-box;
+    }
+  
     body {
       font-family: 'Poppins', sans-serif;
       display: flex;
@@ -20,13 +24,13 @@
       text-align: center;
       padding: 20px;
     }
-
+  
     h1 {
       font-size: 2.2rem;
       font-weight: 700;
       margin-bottom: 20px;
     }
-
+  
     .container {
       background: #ffffffec;
       backdrop-filter: blur(15px);
@@ -37,14 +41,14 @@
       width: 100%;
       max-width: 500px;
     }
-
+  
     form {
       display: flex;
       flex-direction: column;
       gap: 12px;
       width: 100%;
     }
-
+  
     label {
       font-weight: bold;
       font-size: 15px;
@@ -53,8 +57,10 @@
       gap: 5px;
       color: #16423C;
     }
-
-    input {
+  
+    input[type="text"],
+    input[type="number"],
+    input[type="time"] {
       padding: 10px;
       border-radius: 8px;
       border: 2px solid #1976D2;
@@ -62,8 +68,9 @@
       font-size: 14px;
       background: white;
       color: #0D47A1;
+      width: 100%;
     }
-
+  
     button {
       background: #1976D2;
       color: white;
@@ -76,35 +83,42 @@
       font-weight: 600;
       text-transform: uppercase;
       box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+      width: 100%;
     }
-
+  
     button:hover {
       background: #1565C0;
       transform: scale(1.05);
       box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4);
     }
-
+  
     #error-message {
       color: red;
       font-size: 14px;
       margin-top: 5px;
     }
-
+  
     @media (max-width: 480px) {
+      h1 {
+        font-size: 1.6rem;
+      }
+  
       .container {
         padding: 20px;
       }
-
-      h1 {
-        font-size: 1.8rem;
+  
+      label {
+        font-size: 14px;
       }
-
+  
       input,
       button {
-        font-size: 14px;
+        font-size: 13px;
+        padding: 10px;
       }
     }
   </style>
+  
 </head>
 
 <body>

@@ -1,31 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Choose Category</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
+    * {
+      box-sizing: border-box;
+    }
     body {
       font-family: 'Poppins', sans-serif;
       background: linear-gradient(135deg, #7fd0ff, #2764b4);
       color: #fff;
       text-align: center;
-      padding: 30px;
+      padding: 30px 20px;
+      margin: 0;
     }
-    h1 { margin-bottom: 30px; font-size: 2.5rem; }
+    h1 {
+      margin-bottom: 30px;
+      font-size: 2.5rem;
+    }
     .category-container {
-      display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
     }
     .category-box {
-      width: 200px; padding: 25px; border-radius: 20px;
-      background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(12px);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.3); cursor: pointer;
-      transition: transform 0.3s, box-shadow 0.3s; color: #fff; text-decoration: none;
+      width: 200px;
+      padding: 25px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+      transition: transform 0.3s, box-shadow 0.3s;
+      color: #fff;
+      text-decoration: none;
     }
-    .category-box:hover { transform: translateY(-10px); box-shadow: 0 12px 30px rgba(0,0,0,0.4); }
-    .category-icon { font-size: 50px; margin-bottom: 15px; }
-    .category-name { font-size: 18px; font-weight: 600; }
+    .category-box:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+    }
+    .category-icon {
+      font-size: 50px;
+      margin-bottom: 15px;
+    }
+    .category-name {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    /* Responsive tweaks */
+    @media (max-width: 768px) {
+      .category-box {
+        width: 45%;
+        padding: 20px;
+      }
+    }
+
+    @media (max-width: 500px) {
+      h1 {
+        font-size: 1.8rem;
+      }
+      .category-box {
+        width: 100%;
+        padding: 18px;
+      }
+      .category-icon {
+        font-size: 40px;
+      }
+      .category-name {
+        font-size: 16px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -34,24 +83,29 @@
 
 <div class="category-container">
   <a href="{{ url_for('pill_form') }}" class="category-box">
-    <div class="category-icon">💊</div><div class="category-name">Pills Reminder</div>
-</a>
-<a href="{{ url_for('yoga_form') }}" class="category-box">
-    <div class="category-icon">🧘‍♂️</div><div class="category-name">Yoga Session</div>
-</a>
-<a href="{{ url_for('morning_alarm') }}" class="category-box">
-    <div class="category-icon">⏰</div><div class="category-name">Morning Alarm</div>
-</a>
-<a href="{{ url_for('sleeping_alarm') }}" class="category-box">
-    <div class="category-icon">🌙</div><div class="category-name">Sleeping Alarm</div>
-</a>
-<a href="{{ url_for('water_reminder') }}" class="category-box">
-    <div class="category-icon">💧</div><div class="category-name">Water Reminder</div>
-</a>
-<a href="{{ url_for('workout_reminder') }}" class="category-box">
-    <div class="category-icon">🏋️‍♀️</div><div class="category-name">Workout Time</div>
-</a>
-
+    <div class="category-icon">💊</div>
+    <div class="category-name">Pills Reminder</div>
+  </a>
+  <a href="{{ url_for('yoga_form') }}" class="category-box">
+    <div class="category-icon">🧘‍♂️</div>
+    <div class="category-name">Yoga Session</div>
+  </a>
+  <a href="{{ url_for('morning_alarm') }}" class="category-box">
+    <div class="category-icon">⏰</div>
+    <div class="category-name">Morning Alarm</div>
+  </a>
+  <a href="{{ url_for('sleeping_alarm') }}" class="category-box">
+    <div class="category-icon">🌙</div>
+    <div class="category-name">Sleeping Alarm</div>
+  </a>
+  <a href="{{ url_for('water_reminder') }}" class="category-box">
+    <div class="category-icon">💧</div>
+    <div class="category-name">Water Reminder</div>
+  </a>
+  <a href="{{ url_for('workout_reminder') }}" class="category-box">
+    <div class="category-icon">🏋️‍♀️</div>
+    <div class="category-name">Workout Time</div>
+  </a>
 </div>
 
 </body>

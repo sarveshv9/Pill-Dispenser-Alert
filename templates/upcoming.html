@@ -5,37 +5,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>📅 Upcoming Alarms</title>
     <style>
+        * {
+            box-sizing: border-box;
+        }
+    
         body {
             font-family: 'Poppins', sans-serif;
             text-align: center;
             background: linear-gradient(135deg, #E3F2FD, #64B5F6);
             color: #0D47A1;
             padding: 20px;
+            margin: 0;
         }
-
+    
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+    
         .container {
             background: #ffffff;
-            padding: 20px;
+            padding: 25px;
             border-radius: 12px;
             max-width: 600px;
             margin: auto;
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            width: 100%;
         }
-
+    
         .alarm-item {
             padding: 15px;
             border-bottom: 1px solid #ddd;
             margin-bottom: 15px;
             border-radius: 8px;
             background: #f9f9f9;
+            text-align: left;
         }
-
+    
+        .alarm-item b {
+            color: #0D47A1;
+        }
+    
         .alarm-item img {
-            width: 150px;
+            width: 100%;
+            max-width: 150px;
             border-radius: 10px;
             margin-top: 10px;
         }
-
+    
         button {
             background: #1976D2;
             color: white;
@@ -45,12 +62,40 @@
             border: none;
             margin-top: 15px;
             font-weight: bold;
+            font-size: 16px;
+            width: 100%;
+            max-width: 200px;
         }
-
+    
         button:hover {
             background: #1565C0;
         }
+    
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+    
+            .container {
+                padding: 15px;
+            }
+    
+            .alarm-item {
+                font-size: 14px;
+                padding: 10px;
+            }
+    
+            .alarm-item img {
+                max-width: 100%;
+            }
+    
+            button {
+                font-size: 14px;
+                padding: 10px;
+            }
+        }
     </style>
+    
 </head>
 <body>
 
