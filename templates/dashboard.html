@@ -192,6 +192,10 @@
     </div>
   </div>
 
+  <div id="motivation-tip" style="margin-top: 20px; font-style: italic;">
+  💡 Fetching motivation...
+</div>
+
   <div id="alarm-popup">
     <p id="alarm-message"></p>
     <img id="alarm-image" style="display: none;" />
@@ -202,34 +206,42 @@
   <button class="logout-btn" onclick="location.href='/'">🚪 Logout</button>
 
   <script>
+    
+  fetch("/motivation_tip")
+    .then(res => res.json())
+    .then(data => {
+      console.log("Received motivation tip:", data);
+      document.getElementById("motivation-tip").innerText = "💡 " + data.tip;
+    })
+    .catch(err => {
+      console.error("Failed to fetch tip:", err);
+      document.getElementById("motivation-tip").innerText = "💡 You got this!";
+    });
+
     function updateClock() {
       const now = new Date();
       document.getElementById("clock").innerText = now.toLocaleTimeString();
     }
-
     setInterval(updateClock, 1000);
     updateClock();
-
+    
     function checkAlarms() {
       fetch('/get_alarms')
         .then(response => response.json())
         .then(data => {
-          let now = new Date();
-          let currentTime = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
-
-          data.forEach(alarm => {
-            if (alarm.time === currentTime) {
+          if (data.length > 0) {
+            data.forEach(alarm => {
               showAlarmPopup(alarm);
               playSound();
-            }
-          });
+            });
+          }
         })
         .catch(error => console.error("❌ Error fetching alarms:", error));
     }
-
+    
     function showAlarmPopup(alarm) {
       document.getElementById("alarm-message").innerText = "⏰ Time to take: " + alarm.medicine;
-
+    
       let imageElement = document.getElementById("alarm-image");
       if (alarm.image) {
         imageElement.src = alarm.image;
@@ -237,33 +249,32 @@
       } else {
         imageElement.style.display = "none";
       }
-
+    
       document.getElementById("alarm-popup").style.display = "block";
     }
-
+    
     function playSound() {
-      let audio = new Audio('/static/alert.mp3');
-      audio.play();
+      const audio = new Audio('/static/alert.mp3');
+      audio.play().catch(e => console.error("🔇 Could not play sound:", e));
     }
-
+    
     function markAsDone() {
-      fetch('/mark_alarm_done', { method: 'POST' })
-        .then(() => {
-          document.getElementById("alarm-popup").style.display = "none";
-        });
+      document.getElementById("alarm-popup").style.display = "none";
     }
-
+    
     function snoozeAlarm() {
       setTimeout(() => {
         playSound();
         document.getElementById("alarm-popup").style.display = "block";
-      }, 300000); // Snooze for 5 minutes
+      }, 300000); // 5 minutes snooze
       document.getElementById("alarm-popup").style.display = "none";
     }
-
+    
     setInterval(checkAlarms, 60000);
     checkAlarms();
-  </script>
+
+    </script>
+    
 
 </body>
 </html>

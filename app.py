@@ -1,9 +1,15 @@
 import os
+import requests
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from werkzeug.utils import secure_filename
+from dotenv import load_dotenv
 
+# Load environment variables
+load_dotenv()
+
+# Flask App setup
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///alarms.db'
 app.config['UPLOAD_FOLDER'] = 'static/uploads/'
@@ -17,8 +23,48 @@ class Alarm(db.Model):
     completed = db.Column(db.Boolean, default=False)
     start_date = db.Column(db.String(10), nullable=True)
     end_date = db.Column(db.String(10), nullable=True)
-    image = db.Column(db.String(200), nullable=True)  # Store image filename
+    image = db.Column(db.String(200), nullable=True)
 
+# Motivation Tip Function using Gemini API
+def get_motivation_tip(task_type="stay healthy"):
+    try:
+        prompt = f"Give me a short, motivational one-liner for someone trying to {task_type}."
+        api_key = os.getenv("GEMINI_API_KEY")  # Get your API key from the environment
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}"
+
+        headers = {
+            "Content-Type": "application/json"
+        }
+
+        # The request payload
+        payload = {
+            "contents": [{
+                "parts": [{"text": prompt}]
+            }]
+        }
+
+        # Send POST request to Gemini API
+        response = requests.post(url, json=payload, headers=headers)
+
+        print(f"Response Status Code: {response.status_code}")
+        print(f"Response Text: {response.text}")  # Raw response
+
+        if response.status_code == 200:
+            data = response.json()
+            print(f"Parsed Data: {data}")  # Check the parsed data
+            # Gemini returns the content in a nested structure, adjust if necessary
+            if 'candidates' in data and len(data['candidates']) > 0:
+                return data['candidates'][0]['content']['parts'][0].get('text', 'No response text')
+            else:
+                return "🧠 No response text found from Gemini."
+        else:
+            return f"Error: {response.status_code} - {response.text}"
+
+    except Exception as e:
+        print("🚨 Gemini API error:", e)
+        return "You're doing great. Keep going!"
+
+# Routes
 @app.route('/')
 def show_login():
     return render_template('login.html')
@@ -36,11 +82,16 @@ def login():
 def dashboard():
     return render_template('dashboard.html')
 
+@app.route('/motivation_tip')
+def motivation_tip():
+    # Get motivation tip from Gemini API
+    tip = get_motivation_tip("take medicine")
+    return jsonify({"tip": tip})
+
 @app.route('/categories')
 def categories():
     return render_template('categories.html')
 
-# Category: Pill Reminder
 @app.route('/pill')
 def pill_form():
     return render_template('pill.html')
@@ -59,7 +110,7 @@ def add_pill_alarm():
         image_file.save(os.path.join(app.config['UPLOAD_FOLDER'], image_filename))
 
     new_alarm = Alarm(
-        medicine=f"Pill - {name}", 
+        medicine=f"Pill - {name}",
         time=time,
         start_date=start_date,
         end_date=end_date,
@@ -69,7 +120,6 @@ def add_pill_alarm():
     db.session.commit()
     return redirect(url_for('dashboard'))
 
-# Category: Yoga
 @app.route('/yoga')
 def yoga_form():
     return render_template('yoga.html')
@@ -83,7 +133,6 @@ def add_yoga_alarm():
     db.session.commit()
     return redirect(url_for('dashboard'))
 
-# Category: Morning Alarm
 @app.route('/morning_alarm')
 def morning_alarm():
     return render_template('morning.html')
@@ -97,7 +146,6 @@ def add_morning_alarm():
     db.session.commit()
     return redirect(url_for('dashboard'))
 
-# Category: Sleeping Alarm
 @app.route('/sleeping')
 def sleeping_alarm():
     return render_template('sleeping.html')
@@ -111,7 +159,6 @@ def add_sleeping_alarm():
     db.session.commit()
     return redirect(url_for('dashboard'))
 
-# Category: Water Reminder
 @app.route('/water')
 def water_reminder():
     return render_template('water.html')
@@ -125,7 +172,6 @@ def add_water_alarm():
     db.session.commit()
     return redirect(url_for('dashboard'))
 
-# Category: Workout Reminder
 @app.route('/workout')
 def workout_reminder():
     return render_template('workout.html')
@@ -139,7 +185,6 @@ def add_workout_alarm():
     db.session.commit()
     return redirect(url_for('dashboard'))
 
-# General Add Alarm (Optional)
 @app.route('/add_alarm', methods=['POST'])
 def add_alarm():
     medicine = request.form.get('medicine')
@@ -159,38 +204,44 @@ def add_alarm():
 
     return redirect(url_for('upcoming'))
 
-# Upcoming Alarms (with auto-complete logic)
 @app.route('/upcoming')
 def upcoming():
-    now = datetime.now().strftime('%H:%M')
     alarms = Alarm.query.filter_by(completed=False).all()
-
-    for alarm in alarms:
-        if alarm.time < now:
-            alarm.completed = True
-            db.session.commit()
-
     return render_template('upcoming.html', alarms=alarms)
 
-# Completed Alarms
 @app.route('/completed')
 def completed():
     completed_alarms = Alarm.query.filter_by(completed=True).all()
     return render_template('completed.html', alarms=completed_alarms)
 
-# Get alarms for JS frontend
 @app.route('/get_alarms')
 def get_alarms():
+    now = datetime.now().strftime('%H:%M')
     alarms = Alarm.query.filter_by(completed=False).all()
-    alarms_data = []
+    alarms_to_ring = []
+
     for alarm in alarms:
-        alarm_data = {
-            "medicine": alarm.medicine,
-            "time": alarm.time,
-            "image": url_for('static', filename='uploads/' + alarm.image) if alarm.image else None
-        }
-        alarms_data.append(alarm_data)
-    return jsonify(alarms_data)
+        if alarm.time == now:
+            alarms_to_ring.append({
+                "medicine": alarm.medicine,
+                "time": alarm.time,
+                "image": url_for('static', filename='uploads/' + alarm.image) if alarm.image else None
+            })
+            alarm.completed = True
+
+    db.session.commit()
+    return jsonify(alarms_to_ring)
+
+@app.route('/mark_alarm_done', methods=['POST'])
+def mark_alarm_done():
+    data = request.get_json()
+    time = data.get('time')
+    medicine = data.get('medicine')
+    alarm = Alarm.query.filter(Alarm.time == time, Alarm.medicine.in_([medicine, f"Pill - {medicine}", f"Water - {medicine}"]), Alarm.completed == False).first()
+    if alarm:
+        alarm.completed = True
+        db.session.commit()
+    return jsonify({"status": "done"})
 
 if __name__ == '__main__':
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
