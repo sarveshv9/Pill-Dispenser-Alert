@@ -3,211 +3,319 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>💊 Pill Reminder</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>💊 Pill Reminder | HealthAlarm</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        /* General Styles */
+        :root {
+            --primary-color: #1976D2;
+            --primary-light: #E3F2FD;
+            --primary-dark: #0D47A1;
+            --accent-color: #FF9800;
+            --danger-color: #D32F2F;
+            --success-color: #388E3C;
+            --text-color: #2C3E50;
+            --card-bg: rgba(255, 255, 255, 0.95);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary-light), #90CAF9);
+            color: var(--text-color);
+            text-align: center;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-            background: linear-gradient(135deg, #E3F2FD, #64B5F6);
-            color: #0D47A1;
-            text-align: center;
-            padding: 20px;
-            box-sizing: border-box;
         }
-    
+
+        .header {
+            margin: 1.5rem 0;
+            width: 100%;
+        }
+
         h1 {
             font-size: 2.2rem;
             font-weight: 700;
-            margin-bottom: 20px;
+            color: var(--primary-dark);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
         }
-    
+
         .container {
-            background: #ffffffe6;
-            backdrop-filter: blur(15px);
-            padding: 25px;
-            border-radius: 15px;
-            border: 2px solid #2196f399;
-            box-shadow: 0 6px 12px rgba(33, 150, 243, 0.2);
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             width: 100%;
             max-width: 500px;
-            box-sizing: border-box;
+            margin: 1rem 0;
         }
-    
+
         form {
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            width: 100%;
+            gap: 1.2rem;
         }
-    
+
+        .form-group {
+            text-align: left;
+        }
+
         label {
-            font-weight: bold;
-            font-size: 15px;
+            font-weight: 600;
+            color: var(--primary-dark);
             display: flex;
             align-items: center;
-            gap: 5px;
-            color: #16423C;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
         }
-    
+
         input[type="text"],
         input[type="date"],
         input[type="time"],
         input[type="file"] {
-            padding: 10px;
-            border-radius: 8px;
-            border: 2px solid #1976D2;
-            outline: none;
-            font-size: 14px;
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid var(--primary-color);
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
             background: white;
-            color: #0D47A1;
-            width: 100%;
-            box-sizing: border-box;
         }
-    
-        button {
-            background: #1976D2;
-            color: white;
-            padding: 12px;
-            border: 2px solid #0D47A1;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: 0.3s;
-            font-weight: 600;
-            text-transform: uppercase;
-            box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
-            width: 100%;
-            box-sizing: border-box;
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary-dark);
+            box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.2);
         }
-    
-        button:hover {
-            background: #1565C0;
-            transform: scale(1.05);
-            box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4);
-        }
-    
-        .snooze-container {
+
+        .checkbox-group {
             display: flex;
             align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
         }
-    
-        .snooze-container input {
-            width: 16px;
-            height: 16px;
+
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary-color);
+        }
+
+        button {
+            background: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
             cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 0.5rem;
+            box-shadow: 0 4px 10px rgba(25, 118, 210, 0.3);
         }
-    
+
+        button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(25, 118, 210, 0.4);
+        }
+
         #error-message {
-            color: red;
-            font-size: 14px;
-            margin-top: 5px;
+            color: var(--danger-color);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
         }
-    
+
         #alarm-box {
             display: none;
-            margin-top: 20px;
-            background: #1565C0;
-            padding: 15px;
-            border-radius: 12px;
+            background: var(--primary-dark);
             color: white;
-            text-align: center;
-            width: 100%;
-            max-width: 300px;
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-top: 1.5rem;
+            animation: fadeIn 0.3s ease;
         }
-    
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         #alarm-box img {
-            width: 100%;
-            max-width: 80px;
-            height: auto;
+            width: 100px;
+            height: 100px;
             object-fit: cover;
             border-radius: 10px;
-            margin: 10px 0;
+            margin: 1rem 0;
+            border: 3px solid white;
         }
-    
+
+        #alarm-box button {
+            background: var(--success-color);
+            margin-top: 1rem;
+        }
+
+        #alarm-box button:hover {
+            background: #2E7D32;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 1.5rem;
+            left: 1.5rem;
+            background: rgba(25, 118, 210, 0.1);
+            border: none;
+            color: var(--primary-dark);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(25, 118, 210, 0.2);
+            transform: translateX(-3px);
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .container {
+                padding: 1.5rem;
+            }
+        }
+
         @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+
+            .back-btn {
+                top: 1rem;
+                left: 1rem;
+            }
+
             h1 {
                 font-size: 1.6rem;
             }
-    
-            label {
-                font-size: 14px;
-            }
-    
-            input,
-            button {
-                font-size: 13px;
-                padding: 10px;
-            }
-    
+
             .container {
-                padding: 15px;
+                padding: 1.2rem;
             }
-    
-            #alarm-box {
-                font-size: 14px;
-                padding: 12px;
+
+            input, button {
+                padding: 0.7rem;
             }
         }
     </style>
-    
 </head>
 <body>
 
-    <h1>💊 Pill Reminder</h1>
+    <button class="back-btn" onclick="window.history.back()">
+        <i class="bi bi-arrow-left"></i>
+    </button>
+
+    <div class="header">
+        <h1><i class="bi bi-capsule"></i> Pill Reminder</h1>
+    </div>
 
     <div class="container">
-        <form action="{{ url_for('add_alarm') }}" method="POST" enctype="multipart/form-data">
-            <label for="name">👤 Name:</label>
-            <input type="text" name="name" required placeholder="Enter your name">
-
-            <label for="pillName">💊 Pill Name:</label>
-            <input type="text" name="medicine" required placeholder="Enter pill name">
-
-            <label for="startDate">📅 Start Date:</label>
-            <input type="date" name="start_date" required>
-
-            <label for="endDate">📅 End Date:</label>
-            <input type="date" name="end_date" required>
-
-            <label for="alarmTime">⏰ Alarm Time:</label>
-            <input type="time" name="time" required>
-
-            <label for="pillPhoto">📸 Upload Photo:</label>
-            <input type="file" name="image" accept="image/*">
-
-            <div class="snooze-container">
-                <input type="checkbox" name="snooze" value="true">
-                <label for="snooze">🔔 Enable Snooze</label>
+        <form action="{{ url_for('add_pill_alarm') }}" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="name"><i class="bi bi-person"></i> Your Name:</label>
+                <input type="text" name="name" required placeholder="Enter your name">
             </div>
 
-            <button type="submit">✅ Set Reminder</button>
+            <div class="form-group">
+                <label for="medicine"><i class="bi bi-capsule"></i> Medicine Name:</label>
+                <input type="text" name="medicine" required placeholder="Enter medicine name">
+            </div>
+
+            <div class="form-group">
+                <label for="start_date"><i class="bi bi-calendar-plus"></i> Start Date:</label>
+                <input type="date" name="start_date" required>
+            </div>
+
+            <div class="form-group">
+                <label for="end_date"><i class="bi bi-calendar-check"></i> End Date:</label>
+                <input type="date" name="end_date" required>
+            </div>
+
+            <div class="form-group">
+                <label for="time"><i class="bi bi-clock"></i> Reminder Time:</label>
+                <input type="time" name="time" required>
+            </div>
+
+            <div class="form-group">
+                <label for="image"><i class="bi bi-image"></i> Medicine Image:</label>
+                <input type="file" name="image" accept="image/*">
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="snooze" name="snooze" value="true">
+                <label for="snooze"><i class="bi bi-bell"></i> Enable Snooze</label>
+            </div>
+
+            <button type="submit"><i class="bi bi-check-circle"></i> Set Reminder</button>
         </form>
 
         <p id="error-message"></p>
 
-        <!-- Display Upcoming Alarm -->
-        <p id="upcoming-alarm">⏳ No upcoming alarms.</p>
-
         <!-- Alarm Notification Box -->
         <div id="alarm-box">
-            <h2>⏳ Time to take your pill!</h2>
-            <img id="pill-image" src="" alt="Pill Image">
-            <button id="stopAlarm">✔ Done</button>
+            <h2><i class="bi bi-alarm"></i> Time to take your medicine!</h2>
+            <img id="pill-image" src="" alt="Medicine Image">
+            <button id="stopAlarm"><i class="bi bi-check-lg"></i> Mark as Taken</button>
         </div>
     </div>
 
     <script>
+        // Alarm control
         document.getElementById("stopAlarm").addEventListener("click", function() {
             document.getElementById("alarm-box").style.display = "none";
+        });
+
+        // Form validation
+        document.querySelector("form").addEventListener("submit", function(e) {
+            const startDate = new Date(document.querySelector("input[name='start_date']").value);
+            const endDate = new Date(document.querySelector("input[name='end_date']").value);
+            
+            if (startDate > endDate) {
+                e.preventDefault();
+                document.getElementById("error-message").textContent = "End date must be after start date";
+            }
+        });
+
+        // Preview image if selected
+        document.querySelector("input[type='file']").addEventListener("change", function(e) {
+            if (e.target.files.length > 0) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    document.getElementById("pill-image").src = event.target.result;
+                };
+                reader.readAsDataURL(e.target.files[0]);
+            }
         });
     </script>
 </body>

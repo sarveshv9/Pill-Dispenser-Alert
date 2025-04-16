@@ -3,9 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Medicine Alert - Login</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <title>Login | HealthAlarm</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
   <style>
+    :root {
+      --primary-color: #1976D2;
+      --primary-light: #E3F2FD;
+      --primary-dark: #0D47A1;
+      --accent-color: #FF9800;
+      --danger-color: #D32F2F;
+      --success-color: #388E3C;
+      --text-color: #2C3E50;
+      --card-bg: rgba(255, 255, 255, 0.95);
+    }
+
     * {
       margin: 0;
       padding: 0;
@@ -15,151 +27,197 @@
 
     body {
       display: flex;
-      background: url("{{ url_for('static', filename='images/bg.png') }}");
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      background-size: cover;
-      position: relative;
-      color: rgb(0, 0, 0);
+      background: linear-gradient(135deg, var(--primary-light), #90CAF9);
+      color: var(--text-color);
       text-align: center;
       padding: 20px;
+      position: relative;
     }
 
-    body::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(255, 255, 255, 0.5);
-      z-index: 0;
-    }
-
-    .container {
+    .login-container {
       width: 100%;
       max-width: 450px;
-      padding: 25px;
-      border-radius: 15px;
-      background: #ffffffe6;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-      border: 2px solid #2196f399;
+      padding: 2.5rem;
+      border-radius: 20px;
+      background: var(--card-bg);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
       position: relative;
       z-index: 1;
+      animation: fadeIn 0.5s ease;
     }
 
-    .welcome-message h1 {
-      font-size: 22px;
-      font-weight: bold;
-      margin-bottom: 10px;
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    .welcome-message p {
-      font-size: 14px;
-      margin-bottom: 20px;
+    .logo {
+      margin-bottom: 1.5rem;
+    }
+
+    .logo h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .logo p {
+      font-size: 1rem;
       opacity: 0.8;
+      margin-top: 0.5rem;
     }
 
     .login-form {
       display: flex;
       flex-direction: column;
-      gap: 15px;
+      gap: 1.5rem;
+      margin-top: 1.5rem;
     }
 
-    .login-form label {
+    .form-group {
       text-align: left;
-      font-size: 14px;
-      opacity: 0.9;
     }
 
-    .login-form input {
+    .form-group label {
+      font-weight: 600;
+      color: var(--primary-dark);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .form-group input {
       width: 100%;
-      padding: 10px;
-      border: none;
-      border-radius: 8px;
-      background: rgba(0, 0, 0, 0.3);
-      color: rgb(0, 0, 0);
-      font-size: 16px;
-      outline: none;
+      padding: 0.8rem 1rem;
+      border: 2px solid var(--primary-color);
+      border-radius: 10px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      background: white;
     }
 
-    .login-form input::placeholder {
-      color: rgba(0, 0, 0, 0.7);
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--primary-dark);
+      box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.2);
     }
 
     .form-options {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin: 10px 0;
-      font-size: 13px;
-      flex-wrap: wrap;
-      gap: 10px;
+      margin: 0.5rem 0;
     }
 
     .remember-me {
       display: flex;
       align-items: center;
-      gap: 5px;
+      gap: 0.5rem;
+    }
+
+    .remember-me input {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--primary-color);
     }
 
     .forgot-password a {
-      color: rgb(0, 0, 0);
+      color: var(--primary-dark);
       text-decoration: none;
-      opacity: 0.9;
+      font-size: 0.9rem;
+      transition: color 0.3s ease;
     }
 
     .forgot-password a:hover {
+      color: var(--primary-color);
       text-decoration: underline;
     }
 
     .validation-message {
-      color: #ff4d4d;
-      font-size: 14px;
-      min-height: 20px;
+      color: var(--danger-color);
+      font-size: 0.9rem;
+      min-height: 1.2rem;
       text-align: left;
+      margin-top: -0.5rem;
     }
 
-    .login-form button {
-      width: 100%;
-      padding: 12px;
-      background: rgba(0, 0, 0, 0.3);
-      border: 2px solid rgba(255, 255, 255, 0.4);
-      border-radius: 8px;
-      color: rgb(0, 0, 0);
-      font-size: 16px;
-      font-weight: bold;
+    .login-btn {
+      background: var(--primary-color);
+      color: white;
+      padding: 1rem;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
       cursor: pointer;
-      transition: 0.3s;
+      transition: all 0.3s ease;
+      margin-top: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      box-shadow: 0 4px 10px rgba(25, 118, 210, 0.3);
     }
 
-    .login-form button:hover {
-      background: #d3d3d380;
-      transform: scale(1.05);
+    .login-btn:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(25, 118, 210, 0.4);
+    }
+
+    .register-link {
+      margin-top: 1.5rem;
+      font-size: 0.9rem;
+    }
+
+    .register-link a {
+      color: var(--primary-dark);
+      font-weight: 600;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .register-link a:hover {
+      color: var(--primary-color);
+      text-decoration: underline;
+    }
+
+    /* Responsive Styles */
+    @media (max-width: 768px) {
+      .login-container {
+        padding: 2rem;
+      }
+
+      .logo h1 {
+        font-size: 1.8rem;
+      }
     }
 
     @media (max-width: 480px) {
-      .container {
-        padding: 20px;
+      body {
+        padding: 15px;
       }
 
-      .welcome-message h1 {
-        font-size: 20px;
+      .login-container {
+        padding: 1.5rem;
       }
 
-      .welcome-message p {
-        font-size: 13px;
-      }
-
-      .login-form input,
-      .login-form button {
-        font-size: 15px;
+      .logo h1 {
+        font-size: 1.6rem;
       }
 
       .form-options {
         flex-direction: column;
         align-items: flex-start;
+        gap: 0.5rem;
       }
 
       .forgot-password {
@@ -170,33 +228,38 @@
 </head>
 <body>
 
-  <div class="container">
-    <div class="welcome-message">
-      <h1>💊 Welcome to Medicine Alert</h1>
-      <p>Never miss a dose again. Stay on track with your medication!</p>
+  <div class="login-container">
+    <div class="logo">
+      <h1><i class="bi bi-capsule"></i> HealthAlarm</h1>
+      <p>Never miss a dose. Stay on track with your health.</p>
     </div>
-    <div class="login-form">
-      <form id="loginForm" action="/login" method="POST">
-        <label for="username">👤 Username</label>
+
+    <form class="login-form" id="loginForm" action="/login" method="POST">
+      <div class="form-group">
+        <label for="username"><i class="bi bi-person"></i> Username</label>
         <input type="text" id="username" name="username" required placeholder="Enter your username" aria-label="Username">
+      </div>
 
-        <label for="password">🔑 Password</label>
+      <div class="form-group">
+        <label for="password"><i class="bi bi-lock"></i> Password</label>
         <input type="password" id="password" name="password" required placeholder="Enter your password" aria-label="Password">
+      </div>
 
-        <div class="form-options">
-          <div class="remember-me">
-            <input type="checkbox" id="rememberMe" name="rememberMe">
-            <label for="rememberMe">Remember me</label>
-          </div>
-          <div class="forgot-password">
-            <a href="#forgot-password">Forgot password?</a>
-          </div>
+      <div class="form-options">
+        <div class="remember-me">
+          <input type="checkbox" id="rememberMe" name="rememberMe">
+          <label for="rememberMe">Remember me</label>
         </div>
+        <div class="forgot-password">
+          <a href="#forgot-password">Forgot password?</a>
+        </div>
+      </div>
 
-        <div class="validation-message" id="validationMessage"></div>
+      <button type="submit" class="login-btn"><i class="bi bi-box-arrow-in-right"></i> Login</button>
+    </form>
 
-        <button type="submit">✅ Login</button>
-      </form>
+    <div class="register-link">
+      Don't have an account? <a href="#register">Register here</a>
     </div>
   </div>
 
@@ -212,6 +275,17 @@
       } else {
         validationMessage.textContent = '';
       }
+    });
+
+    // Add focus effects
+    const inputs = document.querySelectorAll('input');
+    inputs.forEach(input => {
+      input.addEventListener('focus', () => {
+        input.parentElement.querySelector('label').style.color = 'var(--primary-color)';
+      });
+      input.addEventListener('blur', () => {
+        input.parentElement.querySelector('label').style.color = 'var(--primary-dark)';
+      });
     });
   </script>
 

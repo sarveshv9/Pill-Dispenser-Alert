@@ -3,228 +3,436 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>⏰ Alarm Manager</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <title>⏰ HealthAlarm Manager</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css" rel="stylesheet">
   <style>
+    :root {
+      --primary-color: #1976D2;
+      --primary-light: #E3F2FD;
+      --primary-dark: #0D47A1;
+      --accent-color: #FF9800;
+      --danger-color: #D32F2F;
+      --success-color: #388E3C;
+      --text-color: #2C3E50;
+      --card-bg: rgba(255, 255, 255, 0.95);
+    }
+
     * {
       box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
 
     body {
       font-family: 'Poppins', sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
       min-height: 100vh;
       margin: 0;
       padding: 20px;
-      background: linear-gradient(135deg, #E3F2FD, #64B5F6);
-      color: #0D47A1;
+      background: linear-gradient(135deg, var(--primary-light), #90CAF9);
+      color: var(--text-color);
       text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .header {
+      margin: 1.5rem 0;
+      width: 100%;
     }
 
     h1 {
       font-size: 2.5rem;
       font-weight: 700;
-      text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+      color: var(--primary-dark);
+      margin-bottom: 0.5rem;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .subtitle {
+      font-weight: 400;
+      color: var(--text-color);
+      opacity: 0.8;
+      margin-bottom: 1.5rem;
     }
 
     #clock {
-      font-size: 1.8rem;
+      font-size: 2rem;
       font-weight: 600;
-      margin-bottom: 20px;
+      background: var(--card-bg);
+      padding: 0.5rem 1.5rem;
+      border-radius: 50px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      margin-bottom: 1.5rem;
+      display: inline-block;
     }
 
     .container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 20px;
-      margin-top: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      width: 100%;
+      max-width: 800px;
+      margin: 1rem 0 2rem;
     }
 
     .icon-box {
       display: flex;
       flex-direction: column;
       align-items: center;
-      background: rgba(255, 255, 255, 0.9);
-      border: 2px solid #1976D2;
-      box-shadow: 0 4px 10px rgba(33, 150, 243, 0.2);
+      justify-content: center;
+      background: var(--card-bg);
+      border: 1px solid rgba(25, 118, 210, 0.2);
+      box-shadow: 0 6px 15px rgba(33, 150, 243, 0.15);
       cursor: pointer;
-      transition: transform 0.2s ease, box-shadow 0.3s ease;
-      width: 190px;
-      padding: 20px;
-      border-radius: 15px;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      padding: 1.5rem 1rem;
+      border-radius: 16px;
+      aspect-ratio: 1/1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .icon-box::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      background: var(--primary-color);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s ease;
     }
 
     .icon-box:hover {
       transform: translateY(-5px);
-      box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4);
+      box-shadow: 0 10px 20px rgba(33, 150, 243, 0.2);
     }
 
-    .icon-box .emoji {
-      font-size: 50px;
-      margin-bottom: 10px;
+    .icon-box:hover::before {
+      transform: scaleX(1);
+    }
+
+    .icon-box .icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      color: var(--primary-color);
+      transition: transform 0.3s ease;
+    }
+
+    .icon-box:hover .icon {
+      transform: scale(1.1);
     }
 
     .icon-box p {
-      margin: 10px;
-      font-size: 18px;
-      font-weight: bold;
-      color: #0D47A1;
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-color);
+    }
+
+    .motivation-container {
+      background: var(--card-bg);
+      padding: 1rem 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      max-width: 600px;
+      width: 100%;
+      margin: 1rem 0;
+      position: relative;
+    }
+
+    .motivation-container::before {
+      content: '💡';
+      position: absolute;
+      left: -10px;
+      top: -10px;
+      font-size: 1.5rem;
+      background: var(--primary-light);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    #motivation-tip {
+      font-style: italic;
+      color: var(--text-color);
+      opacity: 0.9;
     }
 
     .logout-btn {
-      margin-top: 30px;
-      padding: 10px 20px;
-      font-size: 16px;
-      background: #D32F2F;
+      margin-top: 1.5rem;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      background: var(--danger-color);
       color: white;
       border: none;
-      border-radius: 8px;
+      border-radius: 50px;
       cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: 0 4px 8px rgba(211, 47, 47, 0.2);
     }
 
     .logout-btn:hover {
       background: #B71C1C;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(211, 47, 47, 0.3);
     }
 
+    /* Alarm Popup Styles */
     #alarm-popup {
       display: none;
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
       text-align: center;
       z-index: 1000;
+      width: 90%;
+      max-width: 400px;
+      animation: fadeIn 0.3s ease;
     }
 
-    #alarm-popup img {
-      width: 100px;
-      border-radius: 10px;
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translate(-50%, -40%); }
+      to { opacity: 1; transform: translate(-50%, -50%); }
+    }
+
+    #alarm-message {
+      font-size: 1.2rem;
+      margin-bottom: 1.5rem;
+      font-weight: 500;
+      color: var(--text-color);
+    }
+
+    #alarm-image {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 12px;
+      margin: 0 auto 1.5rem;
+      display: block;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
 
     .popup-btn {
-      margin-top: 10px;
-      padding: 10px 15px;
+      margin: 0.5rem;
+      padding: 0.75rem 1.5rem;
       border: none;
       cursor: pointer;
-      border-radius: 8px;
-      font-size: 16px;
+      border-radius: 50px;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      min-width: 120px;
     }
 
     .done-btn {
-      background: green;
+      background: var(--success-color);
       color: white;
     }
 
     .snooze-btn {
-      background: orange;
+      background: var(--accent-color);
       color: white;
     }
 
     .popup-btn:hover {
-      opacity: 0.8;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
 
+    .popup-btn:active {
+      transform: translateY(0);
+    }
+
+    /* Floating Action Button */
+    .fab {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      width: 60px;
+      height: 60px;
+      background: var(--primary-color);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      box-shadow: 0 4px 15px rgba(25, 118, 210, 0.4);
+      cursor: pointer;
+      z-index: 100;
+      transition: all 0.3s ease;
+    }
+
+    .fab:hover {
+      transform: translateY(-5px) scale(1.1);
+      box-shadow: 0 8px 20px rgba(25, 118, 210, 0.5);
+    }
+
+    /* Responsive Styles */
     @media (max-width: 768px) {
       h1 {
         font-size: 2rem;
+      }
+
+      .subtitle {
+        font-size: 0.9rem;
       }
 
       #clock {
         font-size: 1.5rem;
       }
 
-      .icon-box {
-        width: 140px;
-        padding: 16px;
+      .container {
+        grid-template-columns: repeat(2, 1fr);
       }
 
-      .icon-box .emoji {
-        font-size: 40px;
+      .icon-box {
+        padding: 1.25rem;
+      }
+
+      .icon-box .icon {
+        font-size: 2rem;
       }
 
       .icon-box p {
-        font-size: 16px;
+        font-size: 1rem;
       }
     }
 
-    @media (max-width: 500px) {
-      .icon-box {
-        width: 100%;
+    @media (max-width: 480px) {
+      body {
+        padding: 15px;
+      }
+
+      .header {
+        margin: 1rem 0;
       }
 
       .container {
-        flex-direction: column;
-        gap: 15px;
+        grid-template-columns: 1fr;
+        gap: 1rem;
       }
 
-      .logout-btn {
-        width: 100%;
-        font-size: 15px;
+      .icon-box {
+        aspect-ratio: unset;
+        padding: 1.5rem;
+        flex-direction: row;
+        justify-content: flex-start;
+        gap: 1rem;
+      }
+
+      .icon-box .icon {
+        margin-bottom: 0;
+        font-size: 1.8rem;
+      }
+
+      .fab {
+        width: 50px;
+        height: 50px;
+        font-size: 1.3rem;
+        bottom: 1.5rem;
+        right: 1.5rem;
       }
     }
   </style>
 </head>
 <body>
 
-  <h1>⏰ Alarm Manager</h1>
-  <h2 id="clock">00:00:00</h2>
+  <div class="header">
+    <h1>⏰ HealthAlarm</h1>
+    <p class="subtitle">Your personal health reminder companion</p>
+    <div id="clock">00:00:00</div>
+  </div>
 
   <div class="container">
     <div class="icon-box" onclick="location.href='/upcoming'">
-      <span class="emoji">⏳</span>
+      <div class="icon"><i class="bi bi-alarm"></i></div>
       <p>Upcoming Alarms</p>
     </div>
     <div class="icon-box" onclick="location.href='/categories'">
-      <span class="emoji">➕</span>
+      <div class="icon"><i class="bi bi-plus-circle"></i></div>
       <p>Set New Alarm</p>
     </div>
     <div class="icon-box" onclick="location.href='/completed'">
-      <span class="emoji">✅</span>
+      <div class="icon"><i class="bi bi-check-circle"></i></div>
       <p>Completed Alarms</p>
     </div>
   </div>
 
-  <div id="motivation-tip" style="margin-top: 20px; font-style: italic;">
-  💡 Fetching motivation...
-</div>
+  <div class="motivation-container">
+    <div id="motivation-tip">Loading your daily motivation...</div>
+  </div>
 
+  <button class="logout-btn" onclick="location.href='/'">
+    <i class="bi bi-box-arrow-right"></i> Logout
+  </button>
+
+  <div class="fab" onclick="location.href='/categories'">
+    <i class="bi bi-plus"></i>
+  </div>
+
+  <!-- Alarm Popup -->
   <div id="alarm-popup">
     <p id="alarm-message"></p>
     <img id="alarm-image" style="display: none;" />
-    <button class="popup-btn done-btn" onclick="markAsDone()">Done</button>
-    <button class="popup-btn snooze-btn" onclick="snoozeAlarm()">Snooze</button>
+    <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+      <button class="popup-btn done-btn" onclick="markAsDone()">
+        <i class="bi bi-check-lg"></i> Done
+      </button>
+      <button class="popup-btn snooze-btn" onclick="snoozeAlarm()">
+        <i class="bi bi-clock"></i> Snooze
+      </button>
+    </div>
   </div>
 
-  <button class="logout-btn" onclick="location.href='/'">🚪 Logout</button>
-
   <script>
-    
-  fetch("/motivation_tip")
-    .then(res => res.json())
-    .then(data => {
-      console.log("Received motivation tip:", data);
-      document.getElementById("motivation-tip").innerText = "💡 " + data.tip;
-    })
-    .catch(err => {
-      console.error("Failed to fetch tip:", err);
-      document.getElementById("motivation-tip").innerText = "💡 You got this!";
-    });
-
+    // Update clock
     function updateClock() {
       const now = new Date();
-      document.getElementById("clock").innerText = now.toLocaleTimeString();
+      const timeString = now.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
+      });
+      document.getElementById("clock").innerText = timeString;
     }
     setInterval(updateClock, 1000);
     updateClock();
-    
+
+    // Fetch motivation tip
+    function fetchMotivation() {
+      fetch("/motivation_tip")
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById("motivation-tip").innerText = data.tip || "Stay motivated! You're doing great!";
+        })
+        .catch(err => {
+          console.error("Failed to fetch tip:", err);
+          document.getElementById("motivation-tip").innerText = "💪 You've got this! Keep going!";
+        });
+    }
+    fetchMotivation();
+    setInterval(fetchMotivation, 300000); // Refresh every 5 minutes
+
+    // Alarm functions
     function checkAlarms() {
       fetch('/get_alarms')
         .then(response => response.json())
@@ -236,45 +444,57 @@
             });
           }
         })
-        .catch(error => console.error("❌ Error fetching alarms:", error));
+        .catch(error => console.error("Error fetching alarms:", error));
     }
-    
+
     function showAlarmPopup(alarm) {
-      document.getElementById("alarm-message").innerText = "⏰ Time to take: " + alarm.medicine;
-    
-      let imageElement = document.getElementById("alarm-image");
+      document.getElementById("alarm-message").innerText = `Time for: ${alarm.medicine}`;
+      
+      const imageElement = document.getElementById("alarm-image");
       if (alarm.image) {
         imageElement.src = alarm.image;
         imageElement.style.display = "block";
       } else {
         imageElement.style.display = "none";
       }
-    
+      
       document.getElementById("alarm-popup").style.display = "block";
+      
+      // Add vibration if supported
+      if ('vibrate' in navigator) {
+        navigator.vibrate([200, 100, 200]);
+      }
     }
-    
+
     function playSound() {
       const audio = new Audio('/static/alert.mp3');
-      audio.play().catch(e => console.error("🔇 Could not play sound:", e));
+      audio.play().catch(e => console.error("Could not play sound:", e));
     }
-    
+
     function markAsDone() {
       document.getElementById("alarm-popup").style.display = "none";
+      // In a real app, you would send a request to mark the alarm as done
     }
-    
+
     function snoozeAlarm() {
-      setTimeout(() => {
-        playSound();
-        document.getElementById("alarm-popup").style.display = "block";
-      }, 300000); // 5 minutes snooze
       document.getElementById("alarm-popup").style.display = "none";
+      setTimeout(() => {
+        document.getElementById("alarm-popup").style.display = "block";
+        playSound();
+      }, 300000); // 5 minutes
     }
-    
+
+    // Check alarms every minute
     setInterval(checkAlarms, 60000);
     checkAlarms();
 
-    </script>
-    
-
+    // Add click outside to close popup
+    document.addEventListener('click', (e) => {
+      const popup = document.getElementById('alarm-popup');
+      if (popup.style.display === 'block' && !popup.contains(e.target)) {
+        popup.style.display = 'none';
+      }
+    });
+  </script>
 </body>
 </html>
