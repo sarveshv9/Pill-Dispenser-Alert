@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏥 Find Doctors | HealthAlarm</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        :root {
+            --primary-color: #1976D2;
+            --primary-light: #E3F2FD;
+            --primary-dark: #0D47A1;
+            --accent-color: #FF9800;
+            --danger-color: #D32F2F;
+            --success-color: #388E3C;
+            --text-color: #2C3E50;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --light-gray: #f4f6f9;
+            --border-color: #e1e5eb;
+            --green-check: #4CAF50;
+            
+            /* Specialty colors */
+            --cardio-color: #E53935;
+            --neuro-color: #7B1FA2;
+            --ortho-color: #FB8C00;
+            --endo-color: #43A047;
+            --pedi-color: #039BE5;
+            --dent-color: #00897B;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary-light), #90CAF9);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            margin: 1.5rem 0;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .map-container {
+            display: flex;
+            flex-direction: row;
+            gap: 1.5rem;
+            width: 100%;
+            max-width: 1200px;
+            margin: 1rem 0;
+        }
+
+        #map {
+            height: 600px;
+            width: 60%;
+            border-radius: 16px;
+            box-shadow: 0 6px 15px rgba(33, 150, 243, 0.15);
+            border: 1px solid rgba(25, 118, 210, 0.2);
+        }
+
+        .doctor-list {
+            width: 40%;
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 16px;
+            box-shadow: 0 6px 15px rgba(33, 150, 243, 0.15);
+            border: 1px solid rgba(25, 118, 210, 0.2);
+            overflow-y: auto;
+            max-height: 600px;
+        }
+
+        .specialty-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .specialty-tab {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            background-color: var(--primary-light);
+            color: var(--primary-dark);
+        }
+
+        .specialty-tab.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .specialty-section {
+            margin-bottom: 2rem;
+        }
+
+        .specialty-title {
+            color: var(--primary-dark);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        /* Updated doctor card style with dropdown */
+        .doctor-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        /* Specialty-specific border colors */
+        .doctor-item.cardiology { border-left: 4px solid var(--cardio-color); }
+        .doctor-item.neurology { border-left: 4px solid var(--neuro-color); }
+        .doctor-item.orthopedics { border-left: 4px solid var(--ortho-color); }
+        .doctor-item.endocrinology { border-left: 4px solid var(--endo-color); }
+        .doctor-item.pediatrics { border-left: 4px solid var(--pedi-color); }
+        .doctor-item.dentistry { border-left: 4px solid var(--dent-color); }
+
+        .doctor-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .doctor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .doctor-name {
+            font-weight: 600;
+            color: var(--primary-dark);
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .doctor-specialty {
+            font-size: 0.9rem;
+            color: var(--text-color);
+            opacity: 0.8;
+            margin-left: 1.8rem;
+        }
+
+        .doctor-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            padding: 0 1rem;
+        }
+
+        .doctor-details.active {
+            max-height: 500px;
+            padding: 1rem;
+        }
+
+        .doctor-info {
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0.5rem 0;
+            color: var(--text-color);
+        }
+
+        .doctor-check {
+            color: var(--text-color);
+            transition: transform 0.3s ease;
+        }
+
+        .doctor-check.active {
+            transform: rotate(180deg);
+        }
+
+        .back-btn {
+        position: absolute;
+        top: 1.5rem;
+        left: 1.5rem;
+        background: rgba(25, 118, 210, 0.1);
+        border: none;
+        color: var(--primary-dark);
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        z-index: 10;
+        }
+
+        .back-btn:hover {
+        background: rgba(25, 118, 210, 0.2);
+        transform: translateX(-3px);
+        }
+
+        /* Custom Marker Styles */
+        .leaflet-marker-icon {
+            border: none !important;
+            background: none !important;
+        }
+
+        .doctor-marker-container {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+        }
+
+        .doctor-marker {
+            position: relative;
+            top: -15px;
+            left: -15px;
+            border-radius: 50% 50% 50% 0;
+            border: 2px solid white;
+            width: 30px;
+            height: 30px;
+            transform: rotate(-45deg);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Specialty-specific marker colors */
+        .marker-cardiology { background-color: var(--cardio-color); }
+        .marker-neurology { background-color: var(--neuro-color); }
+        .marker-orthopedics { background-color: var(--ortho-color); }
+        .marker-endocrinology { background-color: var(--endo-color); }
+        .marker-pediatrics { background-color: var(--pedi-color); }
+        .marker-dentistry { background-color: var(--dent-color); }
+
+        .doctor-marker i {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(45deg);
+            color: white;
+        }
+
+        .user-marker-container {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+        }
+
+        .user-marker {
+            position: relative;
+            top: -15px;
+            left: -15px;
+            background: var(--success-color);
+            border-radius: 50% 50% 50% 0;
+            border: 2px solid white;
+            width: 30px;
+            height: 30px;
+            transform: rotate(-45deg);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .user-marker i {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(45deg);
+            color: white;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            .map-container {
+                flex-direction: column;
+            }
+            
+            #map, .doctor-list {
+                width: 100%;
+            }
+            
+            #map {
+                height: 400px;
+            }
+            
+            .doctor-list {
+                max-height: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+
+            .back-btn {
+                top: 1rem;
+                left: 1rem;
+            }
+
+            h1 {
+                font-size: 1.6rem;
+            }
+
+            .specialty-tabs {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <button class="back-btn" onclick="window.history.back()">
+        <i class="bi bi-arrow-left"></i>
+    </button>
+
+    <div class="header">
+        <h1><i class="bi bi-hospital"></i> Find Doctors</h1>
+    </div>
+
+    <div class="map-container">
+        <div id="map"></div>
+        
+        <div class="doctor-list">
+            <div class="specialty-tabs">
+                <button class="specialty-tab active" onclick="filterDoctors('all')">All Specialties</button>
+                <button class="specialty-tab" onclick="filterDoctors('cardiology')">Cardiology</button>
+                <button class="specialty-tab" onclick="filterDoctors('neurology')">Neurology</button>
+                <button class="specialty-tab" onclick="filterDoctors('orthopedics')">Orthopedics</button>
+                <button class="specialty-tab" onclick="filterDoctors('endocrinology')">Endocrinology</button>
+                <button class="specialty-tab" onclick="filterDoctors('pediatrics')">Pediatrics</button>
+                <button class="specialty-tab" onclick="filterDoctors('dentistry')">Dentistry</button>
+            </div>
+            
+            <!-- Cardiology Section -->
+            <div class="specialty-section" id="cardiology-section">
+                <h3 class="specialty-title"><i class="bi bi-heart-pulse" style="color: var(--cardio-color)"></i> Cardiology</h3>
+                
+                <div class="doctor-item cardiology" id="doctor-1">
+                    <div class="doctor-header" onclick="toggleDoctorDetails(this)">
+                        <div>
+                            <div class="doctor-name">
+                                <i class="bi bi-person-badge"></i> Dr. Rajesh Sharma
+                            </div>
+                            <div class="doctor-specialty">Cardiologist</div>
+                        </div>
+                        <div class="doctor-check">
+                            <i class="bi bi-chevron-down"></i>
+                        </div>
+                    </div>
+                    <div class="doctor-details">
+                        <div class="doctor-info">
+                            <i class="bi bi-hospital"></i> Apollo Hospitals
+                        </div>
+                        <div class="doctor-info">
+                            <i class="bi bi-geo-alt"></i> CBD Belapur, Navi Mumbai
+                        </div>
+                        <div class="doctor-info">
+                            <i class="bi bi-telephone"></i> +91 22 2770 2771
+                        </div>
+                        <div class="doctor-info">
+                            <i class="bi bi-globe"></i> <a href="https://www.apollohospitals.com" target="_blank">www.apollohospitals.com</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="doctor-item cardiology" id="doctor-2">
+                    <div class="doctor-header" onclick="toggleDoctorDetails(this)">
+                        <div>
+                            <div class="doctor-name">
+                                <i class="bi bi-person-badge"></i> Dr. Priya Patel
+                            </div>
+                            <div class="doctor-specialty">Cardiac Surgeon</div>
+                        </div>
+                        <div class="doctor-check">
+                            <i class="bi bi-chevron-down"></i>
+                        </div>
+                    </div>
+                    <div class="doctor-details">
+                        <div class="doctor-info">
+                            <i class="bi bi-hospital"></i> Fortis Hospital
+                        </div>
+                        <div class="doctor-info">
+                            <i class="bi bi-geo-alt"></i> Vashi, Navi Mumbai
+                        </div>
+                        <div class="doctor-info">
+                            <i class="bi bi-telephone"></i> +91 22 6178 4444
+                        </div>
+                        <div class="doctor-info">
+                            <i class="bi bi-globe"></i> <a href="https://www.fortishiranandani.com" target="_blank">www.fortishiranandani.com</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Neurology Section -->
+            <div class="specialty-section" id="neurology-section">
+                <h3 class="specialty-title"><i class="bi bi-activity" style="color: var(--neuro-color)"></i> Neurology</h3>
+                
+                <div class="doctor-item neurology" id="doctor-3">
+                    <div class="doctor-header" onclick="toggleDoctorDetails(this)">
+                        <div>
+                            <div class="doctor-name">
+                                <i class="bi bi-person-badge"></i> Dr. Amit Desai
+                            </div>
+                            <div class="doctor-specialty">Neurologist</div>
+                        </div>
+                        <div class="doctor-check">
+                            <i class="bi bi-chevron-down"></i>
+                        </div>
+                    </div>
+                    <div class="doctor-details">
+                        <div class="doctor-info">
+                            <i class="bi bi-hospital"></i> Wockhardt Hospitals
+                        </div>
+                        <div class="doctor-info">
+                            <i class="bi bi-geo-alt"></i> Kharghar, Navi Mumbai
+                        </div>
+                        <div class="doctor-info">
+                            <i class="bi bi-telephone"></i> +91 22 4915 5151
+                        </div>
+                        <div class="doctor-info">
+                            <i class="bi bi-globe"></i> <a href="https://www.wockhardthospitals.com" target="_blank">www.wockhardthospitals.com</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Orthopedics Section -->
+            <div class="specialty-section" id="orthopedics-section">
+                <h3 class="specialty-title"><i class="bi bi-bone" style="color: var(--ortho-color)"></i> Orthopedics</h3>
+                
+                <div class="doctor-item orthopedics" id="doctor-4">
+                    <div class="doctor-header" onclick="toggleDoctorDetails(this)">
+                        <div>
+                            <div class="doctor-name">
+                                <i class="bi bi-person-badge"></i> Dr. Sanjay Gupta
+                            </div>
+                            <div class="doctor-specialty">Orthopedic Surgeon</div>
+                        </div>
+                        <div class="doctor-check">
+                            <i class="bi bi-chevron-down"></i>
+                        </div>
+                    </div>
+                    <div class="doctor-details">
+                        <div class="doctor-info">
+                            <i class="bi bi-hospital"></i> MGM Hospital
+                        </div>
+                        <div class="doctor-info">
+                            <i class="bi bi-geo-alt"></i> Vashi, Navi Mumbai
+                        </div>
+                        <div class="doctor-info">
+                            <i class="bi bi-telephone"></i> +91 22 2789 9999
+                        </div>
+                        <div class="doctor-info">
+                            <i class="bi bi-globe"></i> <a href="https://www.mgmhospitalvashi.net" target="_blank">www.mgmhospitalvashi.net</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="doctor-item orthopedics" id="doctor-5">
+                    <div class="doctor-header" onclick="toggleDoctorDetails(this)">
+                        <div>
+                            <div class="doctor-name">
+                                <i class="bi bi-person-badge"></i> Dr. Neha Joshi
+                            </div>
+                            <div class="doctor-specialty">Joint Replacement Specialist</div>
+                        </div>
+                        <div class="doctor-check">
+                            <i class="bi bi-chevron-down"></i>
+                        </div>
+                    </div>
+                    <div class="doctor-details">
+                        <div class="doctor-info">
+                            <i class="bi bi-hospital"></i> DY Patil Hospital
+                        </div>
+                        <div class="doctor-info">
+                            <i class="bi bi-geo-alt"></i> Nerul, Navi Mumbai
+                        </div>
+                        <div class="doctor-info">
+                            <i class="bi bi-telephone"></i> +91 22 2771 7777
+                        </div>
+                        <div class="doctor-info">
+                            <i class="bi bi-globe"></i> <a href="https://www.dypatilhospital.com" target="_blank">www.dypatilhospital.com</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Endocrinology Section -->
+            <div class="specialty-section" id="endocrinology-section">
+                <h3 class="specialty-title"><i class="bi bi-droplet" style="color: var(--endo-color)"></i> Endocrinology</h3>
+                
+                <div class="doctor-item endocrinology" id="doctor-6">
+                    <div class="doctor-header" onclick="toggleDoctorDetails(this)">
+                        <div>
+                            <div class="doctor-name">
+                                <i class="bi bi-person-badge"></i> Dr. Pramod Bhinde
+                            </div>
+                            <div class="doctor-specialty">Endocrinologist</div>
+                        </div>
+                        <div class="doctor-check">
+                            <i class="bi bi-chevron-down"></i>
+                        </div>
+                    </div>
+                    <div class="doctor-details">
+                        <div class="doctor-info">
+                            <i class="bi bi-hospital"></i> Apollo Hospitals
+                        </div>
+                        <div class="doctor-info">
+                            <i class="bi bi-geo-alt"></i> CBD Belapur, Navi Mumbai
+                        </div>
+                        <div class="doctor-info">
+                            <i class="bi bi-telephone"></i> +91 22 2770 2771
+                        </div>
+                        <div class="doctor-info">
+                            <i class="bi bi-globe"></i> <a href="https://www.apollohospitals.com" target="_blank">www.apollohospitals.com</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="doctor-item endocrinology" id="doctor-7">
+                    <div class="doctor-header" onclick="toggleDoctorDetails(this)">
+                        <div>
+                            <div class="doctor-name">
+                                <i class="bi bi-person-badge"></i> Dr. Anil Bhoraskar
+                            </div>
+                            <div class="doctor-specialty">Endocrinologist</div>
+                        </div>
+                        <div class="doctor-check">
+                            <i class="bi bi-chevron-down"></i>
+                        </div>
+                    </div>
+                    <div class="doctor-details">
+                        <div class="doctor-info">
+                            <i class="bi bi-hospital"></i> Wockhardt Hospitals
+                        </div>
+                        <div class="doctor-info">
+                            <i class="bi bi-geo-alt"></i> Kharghar, Navi Mumbai
+                        </div>
+                        <div class="doctor-info">
+                            <i class="bi bi-telephone"></i> +91 22 4915 5151
+                        </div>
+                        <div class="doctor-info">
+                            <i class="bi bi-globe"></i> <a href="https://www.wockhardthospitals.com" target="_blank">www.wockhardthospitals.com</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pediatrics Section -->
+            <div class="specialty-section" id="pediatrics-section">
+                <h3 class="specialty-title"><i class="bi bi-emoji-smile" style="color: var(--pedi-color)"></i> Pediatrics</h3>
+                
+                <div class="doctor-item pediatrics" id="doctor-8">
+                    <div class="doctor-header" onclick="toggleDoctorDetails(this)">
+                        <div>
+                            <div class="doctor-name">
+                                <i class="bi bi-person-badge"></i> Dr. Meena Kapoor
+                            </div>
+                            <div class="doctor-specialty">Pediatrician</div>
+                        </div>
+                        <div class="doctor-check">
+                            <i class="bi bi-chevron-down"></i>
+                        </div>
+                    </div>
+                    <div class="doctor-details">
+                        <div class="doctor-info">
+                            <i class="bi bi-hospital"></i> Reliance Hospital
+                        </div>
+                        <div class="doctor-info">
+                            <i class="bi bi-geo-alt"></i> Kopar Khairane, Navi Mumbai
+                        </div>
+                        <div class="doctor-info">
+                            <i class="bi bi-telephone"></i> +91 22 2771 3333
+                        </div>
+                        <div class="doctor-info">
+                            <i class="bi bi-globe"></i> <a href="https://www.reliancehospitals.com" target="_blank">www.reliancehospitals.com</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Dentistry Section -->
+            <div class="specialty-section" id="dentistry-section">
+                <h3 class="specialty-title"><i class="bi bi-tooth" style="color: var(--dent-color)"></i> Dentistry</h3>
+                
+                <div class="doctor-item dentistry" id="doctor-9">
+                    <div class="doctor-header" onclick="toggleDoctorDetails(this)">
+                        <div>
+                            <div class="doctor-name">
+                                <i class="bi bi-person-badge"></i> Dr. Rahul Mehta
+                            </div>
+                            <div class="doctor-specialty">Dentist</div>
+                        </div>
+                        <div class="doctor-check">
+                            <i class="bi bi-chevron-down"></i>
+                        </div>
+                    </div>
+                    <div class="doctor-details">
+                        <div class="doctor-info">
+                            <i class="bi bi-hospital"></i> Smile Care Dental Clinic
+                        </div>
+                        <div class="doctor-info">
+                            <i class="bi bi-geo-alt"></i> Seawoods, Navi Mumbai
+                        </div>
+                        <div class="doctor-info">
+                            <i class="bi bi-telephone"></i> +91 22 2772 7272
+                        </div>
+                        <div class="doctor-info">
+                            <i class="bi bi-globe"></i> <a href="https://www.smilecare.com" target="_blank">www.smilecare.com</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="doctor-item dentistry" id="doctor-10">
+                    <div class="doctor-header" onclick="toggleDoctorDetails(this)">
+                        <div>
+                            <div class="doctor-name">
+                                <i class="bi bi-person-badge"></i> Dr. Priyanka Shah
+                            </div>
+                            <div class="doctor-specialty">Orthodontist</div>
+                        </div>
+                        <div class="doctor-check">
+                            <i class="bi bi-chevron-down"></i>
+                        </div>
+                    </div>
+                    <div class="doctor-details">
+                        <div class="doctor-info">
+                            <i class="bi bi-hospital"></i> Dental World
+                        </div>
+                        <div class="doctor-info">
+                            <i class="bi bi-geo-alt"></i> Vashi, Navi Mumbai
+                        </div>
+                        <div class="doctor-info">
+                            <i class="bi bi-telephone"></i> +91 22 2789 8888
+                        </div>
+                        <div class="doctor-info">
+                            <i class="bi bi-globe"></i> <a href="https://www.dentalworld.com" target="_blank">www.dentalworld.com</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        // Initialize map with Navi Mumbai center
+        var map = L.map('map').setView([19.0330, 73.0297], 12);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        // Custom doctor icon
+        const createDoctorIcon = (specialty) => {
+            return L.divIcon({
+                className: '',
+                html: `
+                    <div class="doctor-marker-container">
+                        <div class="doctor-marker marker-${specialty}">
+                            <i class="bi ${getSpecialtyIcon(specialty)}"></i>
+                        </div>
+                    </div>
+                `,
+                iconSize: [0, 0]
+            });
+        };
+
+        // Get icon for specialty
+        function getSpecialtyIcon(specialty) {
+            switch(specialty) {
+                case 'cardiology': return 'bi-heart-pulse';
+                case 'neurology': return 'bi-activity';
+                case 'orthopedics': return 'bi-bone';
+                case 'endocrinology': return 'bi-droplet';
+                case 'pediatrics': return 'bi-emoji-smile';
+                case 'dentistry': return 'bi-tooth';
+                default: return 'bi-person-badge';
+            }
+        }
+
+        // Custom user icon
+        const createUserIcon = () => {
+            return L.divIcon({
+                className: '',
+                html: `
+                    <div class="user-marker-container">
+                        <div class="user-marker">
+                            <i class="bi bi-person-fill"></i>
+                        </div>
+                    </div>
+                `,
+                iconSize: [0, 0]
+            });
+        };
+
+        // Doctor data
+        const doctors = [
+            {
+                id: "doctor-1",
+                name: "Dr. Rajesh Sharma",
+                position: [19.0160, 73.0204],
+                hospital: "Apollo Hospitals",
+                phone: "+91 22 2770 2771",
+                specialty: "cardiology",
+                address: "CBD Belapur, Navi Mumbai"
+            },
+            {
+                id: "doctor-2",
+                name: "Dr. Priya Patel",
+                position: [19.0723, 72.9986],
+                hospital: "Fortis Hospital",
+                phone: "+91 22 6178 4444",
+                specialty: "cardiology",
+                address: "Vashi, Navi Mumbai"
+            },
+            {
+                id: "doctor-3",
+                name: "Dr. Amit Desai",
+                position: [19.0363, 73.0617],
+                hospital: "Wockhardt Hospitals",
+                phone: "+91 22 4915 5151",
+                specialty: "neurology",
+                address: "Kharghar, Navi Mumbai"
+            },
+            {
+                id: "doctor-4",
+                name: "Dr. Sanjay Gupta",
+                position: [19.0667, 72.9997],
+                hospital: "MGM Hospital",
+                phone: "+91 22 2789 9999",
+                specialty: "orthopedics",
+                address: "Vashi, Navi Mumbai"
+            },
+            {
+                id: "doctor-5",
+                name: "Dr. Neha Joshi",
+                position: [19.0319, 73.0168],
+                hospital: "DY Patil Hospital",
+                phone: "+91 22 2771 7777",
+                specialty: "orthopedics",
+                address: "Nerul, Navi Mumbai"
+            },
+            {
+                id: "doctor-6",
+                name: "Dr. Pramod Bhinde",
+                position: [19.0160, 73.0204],
+                hospital: "Apollo Hospitals",
+                phone: "+91 22 2770 2771",
+                specialty: "endocrinology",
+                address: "CBD Belapur, Navi Mumbai"
+            },
+            {
+                id: "doctor-7",
+                name: "Dr. Anil Bhoraskar",
+                position: [19.0363, 73.0617],
+                hospital: "Wockhardt Hospitals",
+                phone: "+91 22 4915 5151",
+                specialty: "endocrinology",
+                address: "Kharghar, Navi Mumbai"
+            },
+            {
+                id: "doctor-8",
+                name: "Dr. Meena Kapoor",
+                position: [19.1021, 73.0102],
+                hospital: "Reliance Hospital",
+                phone: "+91 22 2771 3333",
+                specialty: "pediatrics",
+                address: "Kopar Khairane, Navi Mumbai"
+            },
+            {
+                id: "doctor-9",
+                name: "Dr. Rahul Mehta",
+                position: [19.0289, 73.0161],
+                hospital: "Smile Care Dental Clinic",
+                phone: "+91 22 2772 7272",
+                specialty: "dentistry",
+                address: "Seawoods, Navi Mumbai"
+            },
+            {
+                id: "doctor-10",
+                name: "Dr. Priyanka Shah",
+                position: [19.0705, 72.9982],
+                hospital: "Dental World",
+                phone: "+91 22 2789 8888",
+                specialty: "dentistry",
+                address: "Vashi, Navi Mumbai"
+            }
+        ];
+
+        // Add doctor markers to map
+        const doctorMarkers = {};
+        doctors.forEach(doctor => {
+            const marker = L.marker(doctor.position, { 
+                icon: createDoctorIcon(doctor.specialty),
+                riseOnHover: true
+            }).addTo(map);
+            
+            marker.bindPopup(`
+                <div style="min-width: 200px">
+                    <h4 style="margin: 0; color: var(--primary-dark)">${doctor.name}</h4>
+                    <p style="margin: 5px 0"><i class="bi bi-hospital"></i> ${doctor.hospital}</p>
+                    <p style="margin: 5px 0"><i class="bi bi-geo-alt"></i> ${doctor.address}</p>
+                    <p style="margin: 5px 0"><i class="bi bi-telephone"></i> ${doctor.phone}</p>
+                    <p style="margin: 5px 0"><i class="bi ${getSpecialtyIcon(doctor.specialty)}"></i> ${formatSpecialty(doctor.specialty)}</p>
+                </div>
+            `);
+            
+            // Store reference to marker
+            doctorMarkers[doctor.id] = marker;
+            
+            // Add click handler to scroll to doctor in list and open details
+            marker.on('click', function() {
+                const doctorElement = document.getElementById(doctor.id);
+                doctorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // Open the doctor details
+                const header = doctorElement.querySelector('.doctor-header');
+                toggleDoctorDetails(header, true);
+                
+                // Filter to show this specialty
+                filterDoctors(doctor.specialty);
+            });
+        });
+
+        // Format specialty for display
+        function formatSpecialty(specialty) {
+            return specialty.charAt(0).toUpperCase() + specialty.slice(1);
+        }
+
+        // Fit map to show all markers
+        const bounds = L.latLngBounds(doctors.map(d => d.position));
+        map.fitBounds(bounds, { padding: [50, 50] });
+
+        // Get user location
+        navigator.geolocation.getCurrentPosition(
+            position => {
+                const { latitude, longitude } = position.coords;
+                
+                // Add user location marker
+                const userMarker = L.marker([latitude, longitude], { 
+                    icon: createUserIcon(),
+                    zIndexOffset: 1000
+                })
+                .addTo(map)
+                .bindPopup("<b>Your Location</b>")
+                .openPopup();
+                
+                // Find nearest 3 doctors
+                const nearestDoctors = findNearestDoctors(latitude, longitude, doctors, 3);
+                highlightNearestDoctors(nearestDoctors);
+                
+                // Adjust map view to include user and nearest doctor
+                const allPoints = [[latitude, longitude], ...nearestDoctors.map(d => d.position)];
+                const newBounds = L.latLngBounds(allPoints);
+                map.fitBounds(newBounds, { padding: [50, 50] });
+            },
+            error => {
+                console.error("Geolocation error:", error);
+            }
+        );
+
+        // Find nearest doctors
+        function findNearestDoctors(userLat, userLng, doctors, count) {
+            return doctors.map(doctor => {
+                const distance = getDistance(userLat, userLng, doctor.position[0], doctor.position[1]);
+                return { ...doctor, distance };
+            })
+            .sort((a, b) => a.distance - b.distance)
+            .slice(0, count);
+        }
+
+        // Calculate distance between coordinates (Haversine formula)
+        function getDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Earth radius in km
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = 
+                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        // Highlight nearest doctors in the list
+        function highlightNearestDoctors(nearestDoctors) {
+            nearestDoctors.forEach(doctor => {
+                const doctorElement = document.getElementById(doctor.id);
+                if (doctorElement) {
+                    // Add temporary highlight
+                    doctorElement.style.boxShadow = '0 0 0 3px var(--accent-color)';
+                    setTimeout(() => {
+                        doctorElement.style.boxShadow = '';
+                    }, 3000);
+                    
+                    // Open the first nearest doctor's details
+                    if (doctor === nearestDoctors[0]) {
+                        const header = doctorElement.querySelector('.doctor-header');
+                        toggleDoctorDetails(header, true);
+                    }
+                }
+            });
+        }
+
+        // Toggle doctor details dropdown
+        function toggleDoctorDetails(header, forceOpen = false) {
+            const item = header.parentElement;
+            const details = header.nextElementSibling;
+            const chevron = header.querySelector('.doctor-check i');
+            
+            if (forceOpen || !details.classList.contains('active')) {
+                // Close all other open details first
+                document.querySelectorAll('.doctor-details.active').forEach(activeDetails => {
+                    if (activeDetails !== details) {
+                        activeDetails.classList.remove('active');
+                        activeDetails.previousElementSibling.querySelector('.doctor-check i').classList.remove('active');
+                    }
+                });
+                
+                // Open this one
+                details.classList.add('active');
+                chevron.classList.add('active');
+            } else {
+                // Close this one
+                details.classList.remove('active');
+                chevron.classList.remove('active');
+            }
+        }
+
+        // Filter doctors by specialty
+        function filterDoctors(specialty) {
+            // Update active tab
+            document.querySelectorAll('.specialty-tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.textContent.toLowerCase().includes(specialty) || 
+                    (specialty === 'all' && tab.textContent === 'All Specialties')) {
+                    tab.classList.add('active');
+                }
+            });
+            
+            // Show/hide sections
+            document.querySelectorAll('.specialty-section').forEach(section => {
+                if (specialty === 'all' || section.id.includes(specialty)) {
+                    section.style.display = 'block';
+                } else {
+                    section.style.display = 'none';
+                }
+            });
+            
+            // Update map markers
+            updateMapMarkers(specialty);
+        }
+
+        // Update map markers based on filter
+        function updateMapMarkers(specialty) {
+            // First remove all markers
+            Object.values(doctorMarkers).forEach(marker => {
+                map.removeLayer(marker);
+            });
+            
+            // Add back only the filtered markers
+            doctors.forEach(doctor => {
+                if (specialty === 'all' || doctor.specialty === specialty) {
+                    map.addLayer(doctorMarkers[doctor.id]);
+                }
+            });
+            
+            // Fit map to visible markers
+            const visibleDoctors = specialty === 'all' ? doctors : doctors.filter(d => d.specialty === specialty);
+            if (visibleDoctors.length > 0) {
+                const bounds = L.latLngBounds(visibleDoctors.map(d => d.position));
+                map.fitBounds(bounds, { padding: [50, 50] });
+            }
+        }
+
+        // Add pulse animation for markers
+        const style = document.createElement('style');
+        style.textContent = `
+            .doctor-marker {
+                animation: pulse 2s infinite;
+            }
+            @keyframes pulse {
+                0% { transform: rotate(-45deg) scale(1); box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.4); }
+                70% { transform: rotate(-45deg) scale(1.1); box-shadow: 0 0 0 10px rgba(0, 0, 0, 0); }
+                100% { transform: rotate(-45deg) scale(1); box-shadow: 0 0 0 0 rgba(0, 0, 0, 0); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
