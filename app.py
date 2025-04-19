@@ -5,8 +5,9 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timedelta
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
+from twilio.rest import Client  # Add Twilio import
 
-# Load environment variables
+# Load environment variables from .env file
 load_dotenv()
 
 # Flask App setup
@@ -14,6 +15,38 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///alarms.db'
 app.config['UPLOAD_FOLDER'] = 'static/uploads/'
 db = SQLAlchemy(app)
+
+# Get Twilio credentials from environment variables
+TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
+TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
+TWILIO_PHONE_NUMBER = os.getenv("TWILIO_PHONE_NUMBER")
+USER_PHONE_NUMBER = os.getenv("USER_PHONE_NUMBER")
+
+# Print debug info at startup (remove in production)
+print(f"TWILIO_ACCOUNT_SID: {TWILIO_ACCOUNT_SID[:8]}... (hidden)")
+print(f"TWILIO_AUTH_TOKEN: {TWILIO_AUTH_TOKEN[:4]}... (hidden)" if TWILIO_AUTH_TOKEN else "TWILIO_AUTH_TOKEN: Not set")
+print(f"TWILIO_PHONE_NUMBER: {TWILIO_PHONE_NUMBER}")
+print(f"USER_PHONE_NUMBER: {USER_PHONE_NUMBER}")
+
+# Function to send SMS via Twilio
+def send_sms_notification(message):
+    """Send SMS notification using Twilio"""
+    if not all([TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_NUMBER, USER_PHONE_NUMBER]):
+        print("Twilio credentials not properly configured. SMS not sent.")
+        return False
+    
+    try:
+        client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+        sms_message = client.messages.create(
+            body=message,
+            from_=TWILIO_PHONE_NUMBER,
+            to=USER_PHONE_NUMBER
+        )
+        print(f"SMS notification sent successfully: {sms_message.sid}")
+        return True
+    except Exception as e:
+        print(f"Error sending SMS: {e}")
+        return False
 
 # Alarm Model (updated with last_triggered column)
 class Alarm(db.Model):
@@ -221,6 +254,13 @@ def get_alarms():
 
     for alarm in alarms:
         if alarm.time == current_time:
+            # Send SMS notification when alarm is triggered
+            alarm_type = alarm.medicine.split(' - ')[0] if ' - ' in alarm.medicine else "Reminder"
+            alarm_name = alarm.medicine.split(' - ')[1] if ' - ' in alarm.medicine else alarm.medicine
+            
+            message = f"REMINDER: It's time for your {alarm_type} - {alarm_name} at {alarm.time}"
+            send_sms_notification(message)
+            
             alarms_to_ring.append({
                 "id": alarm.id,
                 "medicine": alarm.medicine,
@@ -288,7 +328,15 @@ def clear_completed():
     return jsonify({'status': 'success'})
 
 if __name__ == '__main__':
+    # Create upload directory if it doesn't exist
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+    
+    # Check if Twilio is configured properly
+    if not all([TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_NUMBER, USER_PHONE_NUMBER]):
+        print("⚠️ WARNING: Twilio is not fully configured. SMS notifications will not work.")
+        print("Please check your .env file and make sure all Twilio environment variables are set.")
+    
     with app.app_context():
         db.create_all()
+    
     app.run(debug=True)
