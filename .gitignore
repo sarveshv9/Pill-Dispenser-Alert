@@ -1,5 +1,24 @@
-venv
-.env
+# Python
 __pycache__/
+*.py[cod]
+*.egg
+*.egg-info/
+*.pyo
+
+# Env files
+.env
+venv/
+ENV/
+env/
+
+# VSCode/IDEs
+.vscode/
+.idea/
+
+# History or backup
 .history/
+*.bak
+*.swp
+
+# Flask-specific
 instance/
