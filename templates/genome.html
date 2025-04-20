@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Habit Genome Analyzer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #1976D2;
+            --primary-light: #E3F2FD;
+            --primary-dark: #0D47A1;
+            --accent-color: #FF9800;
+            --danger-color: #D32F2F;
+            --success-color: #388E3C;
+            --text-color: #2C3E50;
+            --card-bg: rgba(255, 255, 255, 0.95);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary-light), #90CAF9);
+            color: var(--text-color);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            margin: 1.5rem 0;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 0.5rem;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .subtitle {
+            font-weight: 400;
+            color: var(--text-color);
+            opacity: 0.8;
+            margin-bottom: 1.5rem;
+        }
+
+        .genome-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0;
+            width: 100%;
+        }
+        
+        .genome-section {
+            background: var(--card-bg);
+            border: 1px solid rgba(25, 118, 210, 0.2);
+            box-shadow: 0 6px 15px rgba(33, 150, 243, 0.15);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 25px;
+            text-align: left;
+        }
+        
+        .genome-title {
+            font-size: 1.6rem;
+            color: var(--primary-dark);
+            border-bottom: 2px solid rgba(25, 118, 210, 0.2);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .genome-flex {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            width: 100%;
+        }
+        
+        .genome-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(25, 118, 210, 0.2);
+            box-shadow: 0 4px 8px rgba(33, 150, 243, 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .genome-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+        
+        .genome-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(33, 150, 243, 0.2);
+        }
+        
+        .genome-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .insight-card::before {
+            background: var(--primary-color);
+        }
+        
+        .pattern-card::before {
+            background: var(--accent-color);
+        }
+        
+        .recommendation-card::before {
+            background: var(--success-color);
+        }
+        
+        .high-priority::before {
+            background: var(--danger-color);
+        }
+        
+        .medium-priority::before {
+            background: var(--accent-color);
+        }
+        
+        .low-priority::before {
+            background: var(--primary-color);
+        }
+        
+        .genome-card h3 {
+            font-size: 1.2rem;
+            margin-top: 0;
+            color: var(--text-color);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .genome-card p {
+            color: var(--text-color);
+            opacity: 0.8;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        .chart-container {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            border: 1px solid rgba(25, 118, 210, 0.2);
+        }
+        
+        .chart-container img {
+            width: 100%;
+            border-radius: 8px;
+        }
+        
+        .metric-input {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(25, 118, 210, 0.2);
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.1);
+        }
+        
+        .metric-input select,
+        .metric-input input {
+            padding: 12px 15px;
+            border: 1px solid rgba(44, 62, 80, 0.2);
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .metric-input select {
+            flex: 1;
+            min-width: 150px;
+            color: var(--text-color);
+        }
+        
+        .metric-input input[type="number"] {
+            flex: 1;
+            min-width: 100px;
+            color: var(--text-color);
+        }
+        
+        .metric-input textarea {
+            flex: 2;
+            min-width: 200px;
+            padding: 12px 15px;
+            border: 1px solid rgba(44, 62, 80, 0.2);
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+            resize: vertical;
+            color: var(--text-color);
+        }
+        
+        .metric-input button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(25, 118, 210, 0.2);
+        }
+        
+        .metric-input button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(25, 118, 210, 0.3);
+        }
+        
+        .feedback-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .feedback-btn {
+            background-color: transparent;
+            border: 1px solid rgba(44, 62, 80, 0.2);
+            padding: 8px 15px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .feedback-btn.helpful {
+            color: var(--success-color);
+        }
+        
+        .feedback-btn.not-helpful {
+            color: var(--danger-color);
+        }
+        
+        .feedback-btn:hover {
+            background-color: rgba(44, 62, 80, 0.05);
+        }
+        
+        .feedback-btn.active.helpful {
+            background-color: var(--success-color);
+            color: white;
+            border-color: var(--success-color);
+        }
+        
+        .feedback-btn.active.not-helpful {
+            background-color: var(--danger-color);
+            color: white;
+            border-color: var(--danger-color);
+        }
+        
+        .correlation-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .correlation-strong {
+            background-color: var(--success-color);
+        }
+        
+        .correlation-moderate {
+            background-color: var(--accent-color);
+        }
+        
+        .correlation-weak {
+            background-color: rgba(44, 62, 80, 0.3);
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 1.5rem;
+            left: 1.5rem;
+            background: rgba(25, 118, 210, 0.1);
+            border: none;
+            color: var(--primary-dark);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(25, 118, 210, 0.2);
+            transform: translateX(-3px);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(44, 62, 80, 0.1);
+        }
+
+        .data-table th {
+            background-color: rgba(25, 118, 210, 0.1);
+            color: var(--text-color);
+            font-weight: 600;
+        }
+
+        .data-table tr:hover {
+            background-color: rgba(25, 118, 210, 0.05);
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+        }
+
+        .empty-state p {
+            color: var(--text-color);
+            opacity: 0.7;
+            text-align: center;
+            max-width: 500px;
+            margin-bottom: 0.5rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            color: white;
+            font-weight: 500;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .subtitle {
+                font-size: 0.9rem;
+            }
+
+            .genome-flex {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .metric-input {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+
+            .header {
+                margin: 1rem 0;
+            }
+
+            .genome-section {
+                padding: 15px;
+            }
+
+            .genome-title {
+                font-size: 1.4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="genome-container">
+        <button class="back-btn" onclick="location.href='/dashboard'">
+            <i class="bi bi-arrow-left"></i>
+        </button>
+
+        <div class="header">
+            <h1>🧬 Health Habit Genome</h1>
+            <p class="subtitle">Discover patterns in your health data to improve medication adherence</p>
+        </div>
+        
+        <!-- Input form for adding new health metrics -->
+        <div class="genome-section">
+            <h2 class="genome-title">Track New Health Data</h2>
+            <form action="{{ url_for('add_health_metric') }}" method="POST" class="metric-input">
+                <select name="metric_type" required>
+                    <option value="" disabled selected>Select metric type</option>
+                    <option value="sleep">Sleep Quality (1-10)</option>
+                    <option value="mood">Mood (1-10)</option>
+                    <option value="energy">Energy Level (1-10)</option>
+                    <option value="stress">Stress Level (1-10)</option>
+                    <option value="pain">Pain Level (1-10)</option>
+                    <option value="focus">Mental Focus (1-10)</option>
+                </select>
+                <input type="number" name="value" min="1" max="10" step="0.5" placeholder="Value (1-10)" required>
+                <textarea name="notes" placeholder="Optional notes"></textarea>
+                <button type="submit">
+                    <i class="bi bi-plus-circle"></i> Add Data
+                </button>
+            </form>
+        </div>
+        
+        <!-- Recommendations Section -->
+        {% if recommendations %}
+        <div class="genome-section">
+            <h2 class="genome-title">Your Personalized Recommendations</h2>
+            <div class="genome-flex">
+                {% for rec in recommendations %}
+                <div class="genome-card recommendation-card {% if rec.priority %}{{ rec.priority }}-priority{% endif %}">
+                    <h3>{{ rec.title }}</h3>
+                    <p>{{ rec.description }}</p>
+                    {% if rec.priority == 'high' %}
+                    <span class="badge" style="background-color: var(--danger-color)">High Priority</span>
+                    {% elif rec.priority == 'medium' %}
+                    <span class="badge" style="background-color: var(--accent-color)">Medium Priority</span>
+                    {% else %}
+                    <span class="badge" style="background-color: var(--primary-color)">Suggestion</span>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Health Overview Charts -->
+        {% if overview_charts %}
+        <div class="genome-section">
+            <h2 class="genome-title">Health Overview</h2>
+            <div class="genome-flex">
+                {% for metric_type, chart in overview_charts.items() %}
+                <div class="chart-container">
+                    <h3>{{ metric_type|capitalize }} Trends</h3>
+                    <img src="data:image/png;base64,{{ chart }}" alt="{{ metric_type }} chart">
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Correlations Section -->
+        {% if correlations %}
+        <div class="genome-section">
+            <h2 class="genome-title">Health Correlations</h2>
+            <div class="genome-flex">
+                {% for corr in correlations %}
+                <div class="genome-card pattern-card">
+                    <h3>
+                        <span class="correlation-indicator correlation-{{ corr.confidence|lower }}"></span>
+                        {{ corr.metric|capitalize }} & Medication Adherence
+                    </h3>
+                    <p>{{ corr.description }}</p>
+                    <p>Correlation: {{ corr.correlation }} ({{ corr.confidence }})</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Insights Section -->
+        {% if insights %}
+        <div class="genome-section">
+            <h2 class="genome-title">Health Insights</h2>
+            <div class="genome-flex">
+                {% for insight in insights %}
+                <div class="genome-card insight-card" data-insight-id="{{ insight.id }}">
+                    <h3>{{ insight.title }}</h3>
+                    <p>{{ insight.description }}</p>
+                    <p><small>Generated: {{ insight.generated_at.strftime('%Y-%m-%d') }}</small></p>
+                    
+                    <div class="feedback-buttons">
+                        <button class="feedback-btn helpful {% if insight.is_helpful == True %}active{% endif %}" 
+                                onclick="giveInsightFeedback('{{ insight.id }}', true)">
+                            <i class="bi bi-hand-thumbs-up"></i> Helpful
+                        </button>
+                        <button class="feedback-btn not-helpful {% if insight.is_helpful == False %}active{% endif %}" 
+                                onclick="giveInsightFeedback('{{ insight.id }}', false)">
+                            <i class="bi bi-hand-thumbs-down"></i> Not Helpful
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Recent Health Data -->
+        {% if metrics %}
+        <div class="genome-section">
+            <h2 class="genome-title">Your Recent Health Data</h2>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Value</th>
+                        <th>Date & Time</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for metric in metrics %}
+                    <tr>
+                        <td>{{ metric.metric_type|capitalize }}</td>
+                        <td>{{ metric.value }}</td>
+                        <td>{{ metric.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>{{ metric.notes if metric.notes else '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+        
+        <!-- No Data Message -->
+        {% if not metrics and not insights and not correlations and not recommendations %}
+        <div class="genome-section">
+            <div class="empty-state">
+                <i class="bi bi-clipboard-plus"></i>
+                <h3>Start tracking your health data</h3>
+                <p>Add health metrics using the form above to begin generating personalized insights.</p>
+                <p>The more data you add, the more accurate your Health Genome analysis will be!</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        // Function to handle insight feedback
+        function giveInsightFeedback(insightId, isHelpful) {
+            fetch('/insight_feedback', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    insight_id: insightId,
+                    is_helpful: isHelpful
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Update UI to show selection
+                    const cardElement = document.querySelector(`[data-insight-id="${insightId}"]`);
+                    const helpfulBtn = cardElement.querySelector('.helpful');
+                    const notHelpfulBtn = cardElement.querySelector('.not-helpful');
+                    
+                    helpfulBtn.classList.toggle('active', isHelpful);
+                    notHelpfulBtn.classList.toggle('active', !isHelpful);
+                }
+            })
+            .catch(error => {
+                console.error('Error giving feedback:', error);
+            });
+        }
+    </script>
+</body>
+</html>
