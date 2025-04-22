@@ -238,7 +238,7 @@
     {% if alarms %}
       <div class="alarms-list">
         {% for alarm in alarms %}
-          <div class="alarm-item">
+          <div class="alarm-item" data-time="{{ alarm.time }}">
             <div class="alarm-header">
               <div class="alarm-name">
                 <i class="bi 

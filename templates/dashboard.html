@@ -521,12 +521,12 @@
       </button>
     </div>
   </div>
-
   <script>
-    // Store the current alarm that is being displayed
+      // Store the current alarm that is being displayed
     let currentAlarm = null;
-    
-    // Update clock
+    let alarmTimeout = null;
+
+    // Update clock with precise timing
     function updateClock() {
       const now = new Date();
       const timeString = now.toLocaleTimeString('en-US', {
@@ -537,16 +537,20 @@
       });
       document.getElementById("clock").innerText = timeString;
       
-      // Check alarms on every minute change
+      // Check if we need to check for alarms (at the start of each minute)
       if (now.getSeconds() === 0) {
         checkAlarms();
       }
+      
+      // Calculate delay to next second for precise timing
+      const msToNextSecond = 1000 - now.getMilliseconds();
+      setTimeout(updateClock, msToNextSecond);
     }
-    
-    setInterval(updateClock, 1000);
+
+    // Start clock with precise timing
     updateClock();
 
-    // Fetch motivation tip
+    // Fetch motivational tip
     function fetchMotivation() {
       fetch("/motivation_tip")
         .then(res => res.json())
@@ -558,12 +562,18 @@
           document.getElementById("motivation-tip").innerText = "💪 You've got this! Keep going!";
         });
     }
-    
+
     fetchMotivation();
     setInterval(fetchMotivation, 300000); // Refresh every 5 minutes
 
-    // Alarm functions
+    // Enhanced alarm functions with better timing and reliability
     function checkAlarms() {
+      // Clear any existing timeout
+      if (alarmTimeout) {
+        clearTimeout(alarmTimeout);
+        alarmTimeout = null;
+      }
+      
       fetch('/get_alarms')
         .then(response => response.json())
         .then(data => {
@@ -573,9 +583,87 @@
             currentAlarm = alarm; // Store the alarm object
             showAlarmPopup(alarm);
             playSound();
+          } else {
+            // Schedule next check if no alarms currently
+            scheduleNextAlarmCheck();
           }
         })
-        .catch(error => console.error("Error fetching alarms:", error));
+        .catch(error => {
+          console.error("Error fetching alarms:", error);
+          // Even on error, try to schedule next check
+          scheduleNextAlarmCheck();
+        });
+    }
+
+    // Schedule precise check for next alarm time
+    function scheduleNextAlarmCheck() {
+      const now = new Date();
+      
+      // Get all upcoming alarms from the page if possible
+      const alarmTimes = [];
+      document.querySelectorAll('[data-alarm-time]').forEach(el => {
+        alarmTimes.push(el.dataset.alarmTime);
+      });
+      
+      // Calculate time to next minute mark if no visible alarms
+      if (alarmTimes.length === 0) {
+        const secondsToNextMinute = 60 - now.getSeconds();
+        const msToNextMinute = secondsToNextMinute * 1000 - now.getMilliseconds();
+        alarmTimeout = setTimeout(checkAlarms, msToNextMinute);
+        
+        // Also check every 30 seconds as a backup method (from second file)
+        if (secondsToNextMinute > 30) {
+          setTimeout(checkAlarms, 30000);
+        }
+        return;
+      }
+      
+      // Calculate time to next alarm if we have alarm times
+      let nextAlarmMs = null;
+      const currentHours = now.getHours();
+      const currentMinutes = now.getMinutes();
+      const currentTimeValue = currentHours * 60 + currentMinutes;
+      
+      alarmTimes.forEach(timeStr => {
+        const [hoursStr, minutesStr] = timeStr.split(':');
+        const hours = parseInt(hoursStr, 10);
+        const minutes = parseInt(minutesStr, 10);
+        const alarmTimeValue = hours * 60 + minutes;
+        
+        // Calculate minutes difference, accounting for next day
+        let minutesDiff = alarmTimeValue - currentTimeValue;
+        if (minutesDiff <= 0) {
+          minutesDiff += 24 * 60; // Add a day if alarm is earlier today
+        }
+        
+        const msToAlarm = minutesDiff * 60 * 1000 - (now.getSeconds() * 1000) - now.getMilliseconds();
+        
+        if (nextAlarmMs === null || msToAlarm < nextAlarmMs) {
+          nextAlarmMs = msToAlarm;
+        }
+      });
+      
+      // If we found a next alarm time, schedule precise check
+      if (nextAlarmMs !== null) {
+        // Add 500ms buffer to ensure we don't check just before the minute changes
+        alarmTimeout = setTimeout(checkAlarms, nextAlarmMs + 500);
+        
+        // Add backup check - if next alarm is more than 30 seconds away,
+        // also set an interval check (from second file's approach)
+        if (nextAlarmMs > 30000) {
+          setTimeout(checkAlarms, 30000);
+        }
+      } else {
+        // Fallback: check at next minute mark
+        const secondsToNextMinute = 60 - now.getSeconds();
+        const msToNextMinute = secondsToNextMinute * 1000 - now.getMilliseconds();
+        alarmTimeout = setTimeout(checkAlarms, msToNextMinute);
+        
+        // Add backup check every 30 seconds
+        if (secondsToNextMinute > 30) {
+          setTimeout(checkAlarms, 30000);
+        }
+      }
     }
 
     function showAlarmPopup(alarm) {
@@ -591,15 +679,22 @@
       
       document.getElementById("alarm-popup").style.display = "block";
       
-      // Add vibration if supported
+      // Add vibration if supported - enhanced pattern from first file
       if ('vibrate' in navigator) {
-        navigator.vibrate([200, 100, 200]);
+        navigator.vibrate([200, 100, 200, 100, 200]);
       }
     }
 
     function playSound() {
-      const audio = new Audio('/static/alert.mp3');
-      audio.play().catch(e => console.error("Could not play sound:", e));
+      // Create multiple sound instances for more reliable playback (from first file)
+      const audio1 = new Audio('/static/alert.mp3');
+      const audio2 = new Audio('/static/alert.mp3');
+      
+      // Try playing both sounds with slight delay for better notification
+      audio1.play().catch(e => console.error("Could not play sound 1:", e));
+      setTimeout(() => {
+        audio2.play().catch(e => console.error("Could not play sound 2:", e));
+      }, 300);
     }
 
     function markAsDone() {
@@ -625,6 +720,9 @@
         console.log('Success:', data);
         document.getElementById("alarm-popup").style.display = "none";
         currentAlarm = null;
+        
+        // Check if there are more alarms to display (from first file)
+        setTimeout(checkAlarms, 1000);
       })
       .catch((error) => {
         console.error('Error:', error);
@@ -648,13 +746,53 @@
           playSound();
         }
       }, 300000); // 5 minutes
+      
+      // Continue checking for other alarms (from first file)
+      setTimeout(checkAlarms, 1000);
     }
 
-    // Initial check when the page loads
-    checkAlarms();
-    
-    // Check alarms every 30 seconds in addition to the minute changes
-    setInterval(checkAlarms, 30000);
+    // Initial actions when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      // Get all upcoming alarms to schedule precise checks
+      fetch('/upcoming')
+        .then(response => response.text())
+        .then(html => {
+          // Parse the HTML to extract alarm times if possible
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, 'text/html');
+          const alarmTimes = [];
+          
+          doc.querySelectorAll('[data-time]').forEach(el => {
+            alarmTimes.push(el.dataset.time);
+          });
+          
+          // Add data attributes to the current page from response
+          if (alarmTimes.length > 0) {
+            const container = document.createElement('div');
+            container.style.display = 'none';
+            container.id = 'alarm-time-data';
+            
+            alarmTimes.forEach(time => {
+              const el = document.createElement('span');
+              el.dataset.alarmTime = time;
+              container.appendChild(el);
+            });
+            
+            document.body.appendChild(container);
+          }
+          
+          // Initial alarm check
+          checkAlarms();
+        })
+        .catch(error => {
+          console.error("Error fetching upcoming alarms:", error);
+          // Fallback to basic check
+          checkAlarms();
+        });
+        
+      // Backup check every 30 seconds (from second file)
+      setInterval(checkAlarms, 30000);
+    });
 
     // Add click outside to close popup
     document.addEventListener('click', (e) => {
@@ -664,7 +802,6 @@
         currentAlarm = null;
       }
     });
-  </script>
-
+</script>
 </body>
 </html>

@@ -868,11 +868,18 @@ def get_alarms():
     now = datetime.now()
     current_time = now.strftime('%H:%M')
     
+    # Get alarms that should trigger now
     alarms = Alarm.query.filter_by(completed=False).all()
     alarms_to_ring = []
 
     for alarm in alarms:
+        # Check if alarm time matches current time
+        # Use exact minute matching to ensure precise triggering
         if alarm.time == current_time:
+            # Update last_triggered timestamp
+            alarm.last_triggered = now
+            db.session.commit()
+            
             # Send SMS notification when alarm is triggered
             alarm_type = alarm.medicine.split(' - ')[0] if ' - ' in alarm.medicine else "Reminder"
             alarm_name = alarm.medicine.split(' - ')[1] if ' - ' in alarm.medicine else alarm.medicine
