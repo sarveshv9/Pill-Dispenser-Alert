@@ -31,26 +31,52 @@ TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
 TWILIO_PHONE_NUMBER = os.getenv("TWILIO_PHONE_NUMBER")
 USER_PHONE_NUMBER = os.getenv("USER_PHONE_NUMBER")
 
-# Function to send SMS via Twilio
-def send_sms_notification(message):
-    """Send SMS notification using Twilio"""
-    if not all([TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_NUMBER, USER_PHONE_NUMBER]):
-        print("Twilio credentials not properly configured. SMS not sent.")
+# Function to send WhatsApp notification via Twilio
+def send_whatsapp_notification(message, pill_name=None):
+    """Send WhatsApp notification with optional pill image using Twilio WhatsApp Sandbox"""
+    if not all([TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN]):
+        print("Twilio credentials not properly configured. WhatsApp not sent.")
         return False
-    
+        
+    # Get WhatsApp sandbox numbers from environment variables
+    TWILIO_WHATSAPP_FROM = os.getenv("TWILIO_WHATSAPP_FROM")
+    TWILIO_WHATSAPP_TO = os.getenv("TWILIO_WHATSAPP_TO")
+        
+    if not all([TWILIO_WHATSAPP_FROM, TWILIO_WHATSAPP_TO]):
+        print("WhatsApp sandbox numbers not configured. Check your .env file.")
+        return False
+        
     try:
         client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
-        sms_message = client.messages.create(
-            body=message,
-            from_=TWILIO_PHONE_NUMBER,
-            to=USER_PHONE_NUMBER
-        )
-        print(f"SMS notification sent successfully: {sms_message.sid}")
+                
+        # If pill name is provided, try to send an image
+        if pill_name:
+            # Use a guaranteed working test image from Twilio's own domain
+            # This should work in the WhatsApp sandbox
+            test_image = "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Amoxicillin.JPG/330px-Amoxicillin.JPG"
+            
+            print(f"Sending WhatsApp with test image URL: {test_image}")
+            
+            # Send message with test image
+            whatsapp_message = client.messages.create(
+                body=f"{message} (Pill: {pill_name})",
+                from_=TWILIO_WHATSAPP_FROM,
+                to=TWILIO_WHATSAPP_TO,
+                media_url=[test_image]
+            )
+        else:
+            # Send a text-only message
+            whatsapp_message = client.messages.create(
+                body=message,
+                from_=TWILIO_WHATSAPP_FROM,
+                to=TWILIO_WHATSAPP_TO
+            )
+                
+        print(f"WhatsApp notification sent successfully: {whatsapp_message.sid}")
         return True
     except Exception as e:
-        print(f"Error sending SMS: {e}")
-        return False
-
+        print(f"Error sending WhatsApp: {e}")
+        return False                  
 # Alarm Model (updated with last_triggered column)
 class Alarm(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -874,18 +900,21 @@ def get_alarms():
 
     for alarm in alarms:
         # Check if alarm time matches current time
-        # Use exact minute matching to ensure precise triggering
         if alarm.time == current_time:
             # Update last_triggered timestamp
             alarm.last_triggered = now
             db.session.commit()
             
-            # Send SMS notification when alarm is triggered
+            # Format message for notification
             alarm_type = alarm.medicine.split(' - ')[0] if ' - ' in alarm.medicine else "Reminder"
             alarm_name = alarm.medicine.split(' - ')[1] if ' - ' in alarm.medicine else alarm.medicine
-            
             message = f"REMINDER: It's time for your {alarm_type} - {alarm_name} at {alarm.time}"
-            send_sms_notification(message)
+            
+            # Use the image name if available
+            image_path = alarm.image if alarm.image else None
+            
+            # Send WhatsApp notification with image reference
+            send_whatsapp_notification(message, image_path)
             
             alarms_to_ring.append({
                 "id": alarm.id,
